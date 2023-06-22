@@ -54,15 +54,22 @@ export default function Page() {
         f();
     }, []);
 
-    // when collectionName changes, set activeCollectionName to undefined
+    // when tables change, set activeCollectionName to undefined
     useEffect(() => {
-        setActiveCollectionName(undefined);
-    }, [tables]);
+        if (collectionNames.length === 1) {
+            setActiveCollectionName(collectionNames[0]);
+        } else {
+            setActiveCollectionName(undefined);
+        }
+    }, [JSON.stringify(collectionNames)]);
 
-    // when collectionName changes, set activeTableName to undefined
     useEffect(() => {
-        setActiveTableName(undefined);
-    }, [activeCollectionName]);
+        if (tableNames.length === 1) {
+            setActiveTableName(tableNames[0]);
+        } else {
+            setActiveTableName(undefined);
+        }
+    }, [JSON.stringify(tableNames)]);
 
     // when tableName changes, fetch columns
     useEffect(() => {
