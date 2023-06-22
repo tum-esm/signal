@@ -85,7 +85,9 @@ export default function Page() {
 
     return (
         <>
-            <header className={`${inter.className} my-6 mx-6`}>
+            <header
+                className={`${inter.className} flex items-center h-16 px-6 border-b border-slate-200`}
+            >
                 {collectionNames !== undefined && (
                     <div
                         className={cn(
@@ -139,7 +141,13 @@ export default function Page() {
                     </div>
                 )}
             </header>
-            <main className={`${inter.className}`}>
+            <main
+                className={cn(
+                    inter.className,
+                    "px-6 py-4 gap-y-4 flex flex-col bg-slate-50",
+                    "min-h-[calc(100vh-4rem)]"
+                )}
+            >
                 {activeTableName === undefined && (
                     <div className="mx-6 my-6 text-base font-semibold">
                         Select a collection and table to view columns
@@ -150,13 +158,10 @@ export default function Page() {
                         Loading columns...
                     </div>
                 )}
-                {columns !== undefined && (
-                    <div className="flex flex-col mx-6 my-6">
-                        {columns.map((c) => (
-                            <PlotPanel key={c.id} tableColumn={c} />
-                        ))}
-                    </div>
-                )}
+                {columns !== undefined &&
+                    columns.map((c) => (
+                        <PlotPanel key={c.id} tableColumn={c} />
+                    ))}
             </main>
         </>
     );
