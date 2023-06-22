@@ -1,6 +1,5 @@
 import { z } from "zod";
 import PocketBase from "pocketbase";
-import { TableRecordType } from "./fetch-tables";
 
 const tableColumnRecordSchema = z
     .object({
@@ -37,14 +36,16 @@ const tableColumnRecordSchema = z
 
 export type TableColumnRecordType = z.infer<typeof tableColumnRecordSchema>;
 
-export async function fetchTableColumn(
+export async function fetchTableColumns(
     pb: PocketBase,
-    tableRecord: TableRecordType
+    collectionName: string,
+    tableName: string
 ): Promise<TableColumnRecordType[]> {
     const resultList = await pb.collection("signal_columns").getFullList({
         filter:
-            `(table_name="${tableRecord.tableName}") && ` +
-            `(collection_name="${tableRecord.collectionName}")`,
+            `(table_name="${tableName}") && ` +
+            `(collection_name="${collectionName}")`,
+        $autoCancel: false,
     });
     return resultList.map((record) => tableColumnRecordSchema.parse(record));
 }

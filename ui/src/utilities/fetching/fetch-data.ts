@@ -38,6 +38,7 @@ export async function fetchData(
         filter:
             `(signal_column="${columnId}") && ` +
             `(created_at >= "${minDateString}")`,
+        $autoCancel: false,
     });
     return resultList.map((record) => dataRecordSchema.parse(record));
 }

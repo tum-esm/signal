@@ -4,121 +4,157 @@ import PocketBase from "pocketbase";
 const inter = Inter({ subsets: ["latin"] });
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import {
+    TableColumnRecordType,
+    fetchTableColumns,
+} from "@/utilities/fetching/fetch-table-columns";
+import {
+    TableRecordType,
+    fetchTables,
+} from "@/utilities/fetching/fetch-tables";
 
 export default function Page() {
-  const [rawtableRecords, setRawTableRecords] = useState<
-    { id: string; collection_name: string; table_name: string }[] | undefined
-  >(undefined);
-
-  const [collectionNames, setCollectionNames] = useState<string[] | undefined>(
-    undefined
-  );
-  const [collectionName, setCollectionName] = useState<string | undefined>(
-    undefined
-  );
-
-  const [tableNames, setTableNames] = useState<string[] | undefined>(undefined);
-  const [tableName, setTableName] = useState<string | undefined>(undefined);
-
-  //const [columns, setColumns] = useState<string[] | undefined>(undefined);
-
-  async function fetchSignalTables() {
-    const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
-    const resultList = await pb.collection("signal_tables").getFullList();
-    setRawTableRecords(
-      resultList.map((r) => ({
-        id: r.id,
-        collection_name: r.collection_name,
-        table_name: r.table_name,
-      }))
+    const [tables, setTables] = useState<TableRecordType[] | undefined>(
+        undefined
     );
-  }
+    const [columns, setColumns] = useState<TableColumnRecordType[] | undefined>(
+        undefined
+    );
 
-  useEffect(() => {
-    fetchSignalTables();
-  }, []);
+    const [activeCollectionName, setActiveCollectionName] = useState<
+        string | undefined
+    >(undefined);
+    const [activeTableName, setActiveTableName] = useState<string | undefined>(
+        undefined
+    );
 
-  useEffect(() => {
-    if (rawtableRecords) {
-      setCollectionNames(
-        Array.from(new Set(rawtableRecords.map((r) => r.collection_name)))
-      );
-    }
-  }, [rawtableRecords]);
+    const collectionNames = tables ? tables.map((t) => t.collectionName) : [];
+    const tableNames = tables
+        ? tables
+              .filter((t) => t.collectionName === activeCollectionName)
+              .map((t) => t.tableName)
+        : [];
+    const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
-  // when collectionName changes, set tableNames
-  useEffect(() => {
-    setTableName(undefined);
-    if (collectionName === undefined) {
-      setTableNames(undefined);
-    } else {
-      const filtered = rawtableRecords?.filter(
-        (r) => r.collection_name === collectionName
-      );
-      setTableNames(Array.from(new Set(filtered?.map((r) => r.table_name))));
-    }
-  }, [collectionName]);
+    // fetch tables on mount
+    useEffect(() => {
+        async function f() {
+            setTables(await fetchTables(pb));
+        }
+        f();
+    }, []);
 
-  return (
-    <>
-      <header className={`${inter.className} my-6 mx-6`}>
-        {collectionNames !== undefined && (
-          <div
-            className={cn("flex flex-row items-center justify-start gap-x-2")}
-          >
-            <div className="text-base font-semibold">Collection:</div>
-            <Select
-              onValueChange={(v) => setCollectionName(v)}
-              value={collectionName}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a collection" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {collectionNames.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {tableNames !== undefined && (
-              <>
-                <div className="pl-6 text-base font-semibold">Table:</div>
-                <Select
-                  onValueChange={(v) => setTableName(v)}
-                  value={tableName}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a table" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {tableNames.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </>
-            )}
-          </div>
-        )}
-      </header>
-      <main className={`${inter.className}`}>body</main>
-    </>
-  );
+    // when collectionName changes, set activeCollectionName to undefined
+    useEffect(() => {
+        setActiveCollectionName(undefined);
+    }, [tables]);
+
+    // when collectionName changes, set activeTableName to undefined
+    useEffect(() => {
+        setActiveTableName(undefined);
+    }, [activeCollectionName]);
+
+    // when tableName changes, fetch columns
+    useEffect(() => {
+        const f = async () => {
+            if (
+                activeCollectionName !== undefined &&
+                activeTableName !== undefined
+            ) {
+                setColumns(
+                    await fetchTableColumns(
+                        pb,
+                        activeCollectionName,
+                        activeTableName
+                    )
+                );
+            }
+        };
+        f();
+    }, [activeCollectionName, activeTableName]);
+
+    return (
+        <>
+            <header className={`${inter.className} my-6 mx-6`}>
+                {collectionNames !== undefined && (
+                    <div
+                        className={cn(
+                            "flex flex-row items-center justify-start gap-x-2"
+                        )}
+                    >
+                        <div className="text-base font-semibold">
+                            Collection:
+                        </div>
+                        <Select
+                            onValueChange={(v) => setActiveCollectionName(v)}
+                            value={activeCollectionName}
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Select a collection" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    {collectionNames.map((c) => (
+                                        <SelectItem key={c} value={c}>
+                                            {c}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        {activeCollectionName !== undefined && (
+                            <>
+                                <div className="pl-6 text-base font-semibold">
+                                    Table:
+                                </div>
+                                <Select
+                                    onValueChange={(v) => setActiveTableName(v)}
+                                    value={activeTableName}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select a table" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {tableNames.map((c) => (
+                                                <SelectItem key={c} value={c}>
+                                                    {c}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </>
+                        )}
+                    </div>
+                )}
+            </header>
+            <main className={`${inter.className}`}>
+                {activeTableName === undefined && (
+                    <div className="mx-6 my-6 text-base font-semibold">
+                        Select a collection and table to view columns
+                    </div>
+                )}
+                {activeTableName !== undefined && columns === undefined && (
+                    <div className="mx-6 my-6 text-base font-semibold">
+                        Loading columns...
+                    </div>
+                )}
+                {columns !== undefined && (
+                    <div className="mx-6 my-6 whitespace-pre">
+                        {JSON.stringify(columns, null, 2)}
+                    </div>
+                )}
+            </main>
+        </>
+    );
 }

@@ -19,10 +19,9 @@ const tableRecordSchema = z
 
 export type TableRecordType = z.infer<typeof tableRecordSchema>;
 
-export async function fetchData(
-    pb: PocketBase,
-    columnId: string
-): Promise<TableRecordType[]> {
-    const resultList = await pb.collection("signal_tables").getFullList();
+export async function fetchTables(pb: PocketBase): Promise<TableRecordType[]> {
+    const resultList = await pb
+        .collection("signal_tables")
+        .getFullList({ $autoCancel: false });
     return resultList.map((record) => tableRecordSchema.parse(record));
 }
