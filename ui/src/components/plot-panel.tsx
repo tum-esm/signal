@@ -3,7 +3,8 @@ import { DataRecordType, fetchData } from "@/utilities/fetching/fetch-data";
 import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
 import PocketBase from "pocketbase";
 import { useEffect, useMemo, useState } from "react";
-import { min, mean, uniq } from "lodash";
+import { min, mean, uniq, max } from "lodash";
+import { Plot } from "./plot";
 
 export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
     const [data, setData] = useState<DataRecordType[]>([]);
@@ -31,7 +32,7 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
                     current: values[values.length - 1]?.toPrecision(4),
                     min: min(values)?.toPrecision(4),
                     avg: mean(values)?.toPrecision(4),
-                    max: min(values)?.toPrecision(4),
+                    max: max(values)?.toPrecision(4),
                 },
             };
         }, {});
@@ -55,17 +56,38 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
             <div
                 className={cn(
                     "flex flex-col border-r border-slate-200",
-                    "w-[24rem] h-[20rem] flex-shrink-0"
+                    "w-[24rem] min-h-[20rem] flex-shrink-0"
                 )}
             >
+                <h2
+                    className={cn(
+                        "flex flex-col px-4 py-2 bg-slate-800",
+                        "gap-y-1"
+                    )}
+                >
+                    <span className="text-xl whitespace-nowrap">
+                        <span className="mr-1 font-bold text-slate-50">
+                            {props.tableColumn.columnName}
+                        </span>
+                        <span className="text-slate-100">
+                            [{props.tableColumn.unit}]
+                        </span>
+                    </span>
+                    {props.tableColumn.description.length > 0 && (
+                        <p className="text-sm font-normal text-slate-200">
+                            {props.tableColumn.description}
+                        </p>
+                    )}
+                </h2>
                 <div
                     className={cn(
-                        "h-10 w-full bg-slate-900 px-4 flex items-center"
+                        "h-10 w-full bg-slate-900 px-4 flex items-center",
+                        "border-y border-slate-600"
                     )}
                 >
                     <div
                         className={cn(
-                            "grid grid-cols-6 text-sm text-center text-slate-200 w-full"
+                            "grid grid-cols-6 text-sm text-center text-slate-100 w-full"
                         )}
                     >
                         <div className={cn("font-semibold col-span-2")}>
@@ -104,20 +126,8 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
                 </div>
             </div>
             <div className="flex flex-col flex-grow bg-white">
-                <h2 className="flex items-baseline h-10 p-2">
-                    <span className="mr-1 text-lg whitespace-nowrap">
-                        <span className="mr-1 font-bold">
-                            {props.tableColumn.columnName}
-                        </span>
-                        [{props.tableColumn.unit}]
-                    </span>
-                    <p className="px-2 text-sm font-normal">
-                        {props.tableColumn.description}
-                    </p>
-                </h2>
+                <Plot data={data} sensorIds={sensorIds} />
             </div>
-            {/*<div>{JSON.stringify(props.tableColumn, null, 2)}</div>*/}
-            {/*<div>{JSON.stringify(data, null, 2)}</div>*/}
         </div>
     );
 }
