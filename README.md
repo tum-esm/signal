@@ -14,6 +14,8 @@ pip install tum-esm-signal
 **Usage:**
 
 ```python
+from tum_esm_signal import TUM_ESM_SignalClient
+
 signal_client = TUM_ESM_SignalClient(
     cms_identity=cms_identity,
     cms_password=cms_password,
