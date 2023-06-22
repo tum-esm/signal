@@ -28,12 +28,16 @@ class PocketBaseInterface:
         auth_token = self.authenticate(cms_identity, cms_password)
         self.headers = {"Authorization": f"Bearer {auth_token}"}
 
-    def get_existing_column_id(
+    def upsert_column(
         self,
         collection_name: str,
         table_name: str,
         column_name: str,
-    ) -> Optional[str]:
+        unit: str,
+        description: str = None,
+        minimum: float = None,
+        decimal_places: int = None,
+    ) -> str:
         filter_query = (
             "filter=("
             + f"(collection_name='{collection_name}')%26%26"
@@ -47,61 +51,41 @@ class PocketBaseInterface:
         )
         assert str(r.status_code).startswith("2"), f"Failed to get column id: {r.text}"
 
+        column_id: Optional[str] = None
         column_ids: list[str] = [item["id"] for item in r.json()["items"]]
-        if len(column_ids) == 0:
-            return None
-        elif len(column_ids) == 1:
-            return column_ids[0]
+        assert len(column_ids) <= 1, "Multiple column ids found"
+        if len(column_ids) == 1:
+            column_id = column_ids[0]
+            assert isinstance(column_id, str)
+
+        body = {
+            "collection_name": collection_name,
+            "table_name": table_name,
+            "column_name": column_name,
+            "unit": unit,
+            "description": description,
+            "minimum": minimum,
+            "decimal_places": decimal_places,
+        }
+        if column_id is None:
+            r = requests.post(
+                CMS_URL + "/api/collections/signal_columns/records",
+                json=body,
+                headers=self.headers,
+            )
+            assert str(r.status_code).startswith(
+                "2"
+            ), f"Failed to create column: {r.text}"
+            new_column_id = r.json()["id"]
+            assert isinstance(new_column_id, str)
+            return new_column_id
         else:
-            raise Exception("Multiple column ids found")
-
-    def create_column(
-        self,
-        collection_name: str,
-        table_name: str,
-        column_name: str,
-        unit: str,
-        description: str = None,
-        minimum: float = None,
-        decimal_places: int = None,
-    ) -> str:
-        r = requests.post(
-            CMS_URL + "/api/collections/signal_columns/records",
-            json={
-                "collection_name": collection_name,
-                "table_name": table_name,
-                "column_name": column_name,
-                "unit": unit,
-                "description": description,
-                "minimum": minimum,
-                "decimal_places": decimal_places,
-            },
-            headers=self.headers,
-        )
-        assert str(r.status_code).startswith("2"), f"Failed to create column: {r.text}"
-
-    def update_column(
-        self,
-        column_id: str,
-        collection_name: str,
-        table_name: str,
-        column_name: str,
-        unit: str,
-        description: str = None,
-        minimum: float = None,
-        decimal_places: int = None,
-    ) -> None:
-        r = requests.patch(
-            CMS_URL + f"/api/collections/signal_columns/records/{column_id}",
-            json={
-                "collection_name": collection_name,
-                "table_name": table_name,
-                "column_name": column_name,
-                "unit": unit,
-                "description": description,
-                "minimum": minimum,
-                "decimal_places": decimal_places,
-            },
-            headers=self.headers,
-        )
-        assert str(r.status_code).startswith("2"), f"Failed to update column: {r.text}"
+            r = requests.patch(
+                CMS_URL + f"/api/collections/signal_columns/records/{column_id}",
+                json=body,
+                headers=self.headers,
+            )
+            assert str(r.status_code).startswith(
+                "2"
+            ), f"Failed to update column: {r.text}"
+            return column_id

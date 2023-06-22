@@ -25,31 +25,15 @@ class TUM_ESM_SignalClient:
         self.column_name = column_name
 
         # connect column id
-        existing_column_id = self.pockebase.get_existing_column_id(
-            collection_name, table_name, column_name
+        self.column_id = self.pockebase.upsert_column(
+            collection_name,
+            table_name,
+            column_name,
+            unit=unit,
+            description=description,
+            minimum=minimum,
+            decimal_places=decimal_places,
         )
-        if existing_column_id is None:
-            self.column_id = self.pockebase.create_column(
-                collection_name,
-                table_name,
-                column_name,
-                unit=unit,
-                description=description,
-                minimum=minimum,
-                decimal_places=decimal_places,
-            )
-        else:
-            self.column_id = existing_column_id
-            self.pockebase.update_column(
-                self.column_id,
-                collection_name,
-                table_name,
-                column_name,
-                unit=unit,
-                description=description,
-                minimum=minimum,
-                decimal_places=decimal_places,
-            )
 
     def write_date(self, value: float) -> None:
         # determine utc timestamp
