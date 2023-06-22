@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.9"
 pydantic = "^1.10.9"
 requests = "^2.31.0"
+pendulum = "^2.1.2"
 
 
 [tool.poetry.group.dev.dependencies]

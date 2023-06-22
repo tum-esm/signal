@@ -1,4 +1,5 @@
 import tum_esm_signal
+import pendulum
 
 CMS_URL = "https://esm-linode.dostuffthatmatters.dev"
 
@@ -35,9 +36,16 @@ class TUM_ESM_SignalClient:
             decimal_places=decimal_places,
         )
 
-    def write_date(self, value: float) -> None:
-        # determine utc timestamp
-        pass
+    def add_datapoint(self, value: float) -> None:
+        """Add a datapoint to the selected column. The record time
+        is set to the current time."""
 
-        # write value to pocketbase
-        pass
+        # looks like "2021-01-01T00:00:00.000Z"
+        datetime_str = pendulum.now("UTC").to_iso8601_string()
+
+        self.pockebase.create_data_record(
+            column_id=self.column_id,
+            sensor_id=self.sensor_id,
+            value=value,
+            datetime=datetime_str,
+        )

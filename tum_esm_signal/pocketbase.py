@@ -89,3 +89,24 @@ class PocketBaseInterface:
                 "2"
             ), f"Failed to update column: {r.text}"
             return column_id
+
+    def create_data_record(
+        self,
+        column_id: str,
+        sensor_id: str,
+        value: float,
+        datetime_str: str,
+    ) -> None:
+        r = requests.post(
+            CMS_URL + "/api/collections/signal_records/records",
+            json={
+                "signal_column": column_id,
+                "sensor_id": sensor_id,
+                "datetime": datetime_str,
+                "value": value,
+            },
+            headers=self.headers,
+        )
+        assert str(r.status_code).startswith(
+            "2"
+        ), f"Failed to create data record: {r.text}"
