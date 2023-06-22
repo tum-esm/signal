@@ -39,7 +39,7 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
 
     useEffect(() => {
         async function f() {
-            setData(await fetchData(pb, props.tableColumn.id));
+            setData(await fetchData(pb, props.tableColumn));
         }
         f();
     }, [props.tableColumn.id]);

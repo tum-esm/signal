@@ -11,9 +11,9 @@ const tableColumnRecordSchema = z
         column_name: z.string(),
         unit: z.string(),
         description: z.string(),
-        minimum: z.number(),
-        maximum: z.number(),
-        decimal_places: z.number(),
+        minimum: z.union([z.number(), z.null()]),
+        maximum: z.union([z.number(), z.null()]),
+        decimal_places: z.union([z.number(), z.null()]),
     })
     .pick({
         id: true,
