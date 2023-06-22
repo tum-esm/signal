@@ -1,10 +1,31 @@
 import { CONSTANTS } from "@/utilities/constants";
 import { DataRecordType } from "@/utilities/fetching/fetch-data";
+import { generateTicks } from "@/utilities/math";
 import * as d3 from "d3";
-import { useEffect, useRef } from "react";
+import { max, min } from "lodash";
+import { useEffect, useMemo, useRef } from "react";
 
 export function Plot(props: { data: DataRecordType[]; sensorIds: string[] }) {
     const d3ContainerRef = useRef(null);
+
+    const xTicks = useMemo(
+        () =>
+            generateTicks(
+                props.data[0].timestamp,
+                props.data[props.data.length - 1].timestamp,
+                10
+            ),
+        props.data
+    );
+    const yTicks = useMemo(
+        () =>
+            generateTicks(
+                min(props.data.map((d) => d.value)) || 0,
+                max(props.data.map((d) => d.value)) || 0,
+                10
+            ),
+        props.data
+    );
 
     useEffect(() => {
         if (d3ContainerRef.current) {

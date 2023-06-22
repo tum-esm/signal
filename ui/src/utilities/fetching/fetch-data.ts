@@ -16,12 +16,7 @@ const dataRecordSchema = z
     })
     .pick({ sensor_id: true, datetime: true, value: true })
     .transform((o) => ({
-        // datetime looks like 2022-01-01 01:00:00.123Z
-        date: parseInt(o.datetime.split(" ")[0].replace(/-/g, "")),
-        hour:
-            parseInt(o.datetime.substring(11, 13)) +
-            (1 / 60) * parseInt(o.datetime.substring(14, 16)) +
-            (1 / 3600) * parseInt(o.datetime.substring(17, 19)),
+        timestamp: new Date(o.datetime).getTime() / 1000,
         value: o.value,
         sensorId: o.sensor_id,
     }));
