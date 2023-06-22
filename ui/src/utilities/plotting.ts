@@ -5,18 +5,10 @@ import * as d3 from "d3";
 export function plotGrid(
     svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
     xTicks: number[],
-    yTicks: number[]
+    yTicks: number[],
+    xScale: (x: number) => number,
+    yScale: (x: number) => number
 ) {
-    const xScale: (x: number) => number = d3
-        .scaleLinear()
-        .domain([xTicks[0], xTicks[xTicks.length - 1]])
-        .range([CONSTANTS.PLOT.xMin, CONSTANTS.PLOT.xMax]);
-
-    const yScale: (x: number) => number = d3
-        .scaleLinear()
-        .domain([yTicks[0], yTicks[yTicks.length - 1]])
-        .range([CONSTANTS.PLOT.yMin, CONSTANTS.PLOT.yMax]);
-
     // VERICAL GRID LINES
 
     let xGridSelection: any = svg.select(".x-grid-lines");
@@ -83,9 +75,9 @@ export function plotGrid(
         .append("rect")
         .merge(frameRectsSelection)
         .attr("x", xScale(xTicks[0]))
-        .attr("y", yScale(yTicks[0]))
-        .attr("width", xScale(xTicks[xTicks.length - 1]) - xScale(xTicks[0]))
-        .attr("height", yScale(yTicks[yTicks.length - 1]) - yScale(yTicks[0]))
+        .attr("y", yScale(yTicks[yTicks.length - 1]))
+        .attr("width", CONSTANTS.PLOT.xMax - CONSTANTS.PLOT.xMin)
+        .attr("height", CONSTANTS.PLOT.yMax - CONSTANTS.PLOT.yMin)
         .attr("fill", "none")
         .attr("stroke", "#1e293b")
         .attr("stroke-width", 0.5)
@@ -93,4 +85,65 @@ export function plotGrid(
         .attr("stroke-linejoin", "round");
 
     frameRectsSelection.exit().remove();
+}
+
+export function plotLabels(
+    svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
+    xTicks: number[],
+    yTicks: number[],
+    xScale: (x: number) => number,
+    yScale: (x: number) => number
+) {
+    // X LABELS
+
+    let xLabelsSelection: any = svg.select(".x-labels");
+
+    if (xLabelsSelection.empty()) {
+        xLabelsSelection = svg.append("g").attr("class", "x-labels");
+    }
+
+    const xLabelsTextSelection: any = xLabelsSelection
+        .selectAll("text")
+        .data(xTicks);
+
+    xLabelsTextSelection
+        .enter()
+        .append("text")
+        .merge(xLabelsTextSelection)
+        .attr("x", (value: number) => xScale(value))
+        .attr("y", CONSTANTS.PLOT.yMax + 5)
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("font-size", 6)
+        .attr("fill", "#1e293b")
+        // the value is a unix timestamp, only the local time is interesting
+        .text((value: number) => new Date(value).toLocaleTimeString());
+
+    xLabelsTextSelection.exit().remove();
+
+    // Y LABELS
+
+    let yLabelsSelection: any = svg.select(".y-labels");
+
+    if (yLabelsSelection.empty()) {
+        yLabelsSelection = svg.append("g").attr("class", "y-labels");
+    }
+
+    const yLabelsTextSelection: any = yLabelsSelection
+        .selectAll("text")
+        .data(yTicks.slice(1, yTicks.length - 1));
+
+    yLabelsTextSelection
+        .enter()
+        .append("text")
+        .merge(yLabelsTextSelection)
+        .attr("x", CONSTANTS.PLOT.xMin - 3)
+        .attr("y", (value: number) => yScale(value))
+        .attr("text-anchor", "end")
+        .attr("alignment-baseline", "middle")
+        .attr("fill", "#1e293b")
+        .attr("font-size", 6)
+        .text((value: number) => value.toPrecision(3));
+
+    yLabelsTextSelection.exit().remove();
 }

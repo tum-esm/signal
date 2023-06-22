@@ -5,6 +5,6 @@ export function generateTicks(
     maxValue: number,
     stepCount: number
 ): number[] {
-    const step = (maxValue - minValue) / stepCount;
+    const step = (maxValue - minValue) / (stepCount - 1);
     return range(0, stepCount).map((i) => minValue + step * i);
 }
