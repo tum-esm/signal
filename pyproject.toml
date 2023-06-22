@@ -16,6 +16,7 @@ pendulum = "^2.1.2"
 black = "^23.3.0"
 pytest = "^7.3.2"
 mypy = "^1.4.0"
+python-dotenv = "^1.0.0"
 
 [tool.mypy]
 strict = true
