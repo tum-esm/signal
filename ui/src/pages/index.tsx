@@ -151,7 +151,7 @@ export default function Page() {
             <main
                 className={cn(
                     inter.className,
-                    "px-6 py-4 gap-y-4 flex flex-col bg-slate-50",
+                    "p-4 gap-y-4 flex flex-col bg-slate-50",
                     "min-h-[calc(100vh-4rem)]"
                 )}
             >

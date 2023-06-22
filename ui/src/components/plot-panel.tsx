@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { DataRecordType, fetchData } from "@/utilities/fetching/fetch-data";
 import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
 import PocketBase from "pocketbase";
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { min, mean, uniq } from "lodash";
 
 export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
@@ -54,7 +54,8 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
         >
             <div
                 className={cn(
-                    "flex flex-col border-r border-slate-200 w-[24rem] h-[20rem]"
+                    "flex flex-col border-r border-slate-200",
+                    "w-[24rem] h-[20rem] flex-shrink-0"
                 )}
             >
                 <div
@@ -102,7 +103,19 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
                     ))}
                 </div>
             </div>
-            <div className="flex-grow bg-white"></div>
+            <div className="flex flex-col flex-grow bg-white">
+                <h2 className="flex items-baseline h-10 p-2">
+                    <span className="mr-1 text-lg whitespace-nowrap">
+                        <span className="mr-1 font-bold">
+                            {props.tableColumn.columnName}
+                        </span>
+                        [{props.tableColumn.unit}]
+                    </span>
+                    <p className="px-2 text-sm font-normal">
+                        {props.tableColumn.description}
+                    </p>
+                </h2>
+            </div>
             {/*<div>{JSON.stringify(props.tableColumn, null, 2)}</div>*/}
             {/*<div>{JSON.stringify(data, null, 2)}</div>*/}
         </div>
