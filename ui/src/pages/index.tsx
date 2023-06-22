@@ -21,6 +21,7 @@ import {
     TableRecordType,
     fetchTables,
 } from "@/utilities/fetching/fetch-tables";
+import { PlotPanel } from "@/components/plot-panel";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -150,8 +151,10 @@ export default function Page() {
                     </div>
                 )}
                 {columns !== undefined && (
-                    <div className="mx-6 my-6 whitespace-pre">
-                        {JSON.stringify(columns, null, 2)}
+                    <div className="flex flex-col mx-6 my-6">
+                        {columns.map((c) => (
+                            <PlotPanel key={c.id} tableColumn={c} />
+                        ))}
                     </div>
                 )}
             </main>

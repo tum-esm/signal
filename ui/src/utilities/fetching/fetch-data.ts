@@ -31,13 +31,18 @@ export async function fetchData(
     pb: PocketBase,
     columnId: string
 ): Promise<DataRecordType[]> {
-    const minDateString = new Date(
-        Date.now() - 24 * 60 * 60 * 1000
-    ).toISOString();
+    const minDateString = new Date(Date.now() - 24 * 60 * 60 * 1000)
+        .toISOString()
+        .replace("T", " ")
+        .substring(0, 19);
+
+    const filterString =
+        `signal_column = "${columnId}" && ` + `created >= "${minDateString}"`;
+
+    console.log({ minDateString, filterString });
+
     const resultList = await pb.collection("signal_records").getFullList({
-        filter:
-            `(signal_column="${columnId}") && ` +
-            `(created_at >= "${minDateString}")`,
+        filter: filterString,
         $autoCancel: false,
     });
     return resultList.map((record) => dataRecordSchema.parse(record));
