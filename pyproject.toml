@@ -1,10 +1,21 @@
 [tool.poetry]
-name = "signal"
+name = "tum_esm_signal"
 version = "0.1.0"
 description = ""
 authors = ["Moritz Makowski <moritz@dostuffthatmatters.dev>"]
 readme = "README.md"
-packages = [{include = "tum_esm_signal"}]
+packages = [
+    {include = "tum_esm_signal"},
+    {include = "tum_esm_signal/py.typed"}
+]
+keywords = [
+    "python",
+    "library",
+    "utilities",
+    "plotting",
+]
+license = "AGPL-3.0-only"
+repository = "https://github.com/tum-esm/signal"
 
 [tool.poetry.dependencies]
 python = "^3.9"
