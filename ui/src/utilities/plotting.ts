@@ -111,7 +111,7 @@ export function plotLabels(
         .append("text")
         .merge(xLabelsTextSelection)
         .attr("x", (value: number) => xScale(value))
-        .attr("y", CONSTANTS.PLOT.yMax + 5)
+        .attr("y", CONSTANTS.PLOT.yMax + 3)
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "hanging")
         .attr("font-size", 6)
@@ -146,4 +146,33 @@ export function plotLabels(
         .text((value: number) => value.toPrecision(3));
 
     yLabelsTextSelection.exit().remove();
+
+    // X AXIS TITLE
+
+    let xAxisTitleSelection: any = svg.select(".x-axis-title");
+
+    if (xAxisTitleSelection.empty()) {
+        xAxisTitleSelection = svg.append("g").attr("class", "x-axis-title");
+    }
+
+    const xAxisTitleTextSelection: any = xAxisTitleSelection
+        .selectAll("text")
+        .data([1]);
+
+    xAxisTitleTextSelection
+        .enter()
+        .append("text")
+        .merge(xAxisTitleTextSelection)
+        .attr(
+            "x",
+            CONSTANTS.PLOT.xMin +
+                (CONSTANTS.PLOT.xMax - CONSTANTS.PLOT.xMin) / 2
+        )
+        .attr("y", CONSTANTS.PLOT.yMax + 12)
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("fill", "#1e293b")
+        .attr("font-size", 6)
+        .attr("font-weight", 600)
+        .text("Local Time");
 }

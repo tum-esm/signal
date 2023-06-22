@@ -52,7 +52,7 @@ export function Plot(props: { data: DataRecordType[]; sensorIds: string[] }) {
     return (
         <div className="w-full p-4 bg-white">
             <svg
-                className="relative z-0 rounded bg-slate-50 no-selection"
+                className="relative z-0 rounded no-selection"
                 ref={d3ContainerRef}
                 viewBox={`0 0 ${CONSTANTS.PLOT.width} ${CONSTANTS.PLOT.height}`}
             />
