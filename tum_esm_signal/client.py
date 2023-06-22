@@ -12,12 +12,10 @@ class TUM_ESM_SignalClient:
         cms_password: str,
         collection_name: str,
         table_name: str,
-        sensor_id: str,
     ) -> None:
         self.pocketbase = tum_esm_signal.PocketBaseInterface(cms_identity, cms_password)
         self.collection_name = collection_name
         self.table_name = table_name
-        self.sensor_id = sensor_id
 
     def connect_column(
         self,
@@ -65,7 +63,7 @@ class TUM_ESM_SignalClient_SensorColumn:
             decimal_places,
         )
 
-    def add_datapoint(self, value: float) -> None:
+    def add_datapoint(self, sensor_id: str, value: float) -> None:
         """Add a datapoint to the selected column. The record time
         is set to the current time."""
 
@@ -75,7 +73,7 @@ class TUM_ESM_SignalClient_SensorColumn:
 
         self.signal_client.pocketbase.create_data_record(
             self.column_id,
-            self.signal_client.sensor_id,
+            sensor_id,
             value,
             datetime_str,
         )
