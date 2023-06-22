@@ -5,7 +5,7 @@ CMS_URL = "https://esm-linode.dostuffthatmatters.dev"
 
 
 class PocketBaseInterface:
-    auth_token: str = None
+    auth_token: Optional[str] = None
 
     @staticmethod
     def authenticate(cms_identity: str, cms_password: str) -> str:

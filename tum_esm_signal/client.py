@@ -43,7 +43,8 @@ class TUM_ESM_SignalClient:
         is set to the current time."""
 
         # looks like "2021-01-01T00:00:00.000Z"
-        datetime_str = pendulum.now("UTC").to_iso8601_string()
+        datetime_str = pendulum.now("UTC").to_iso8601_string()  # type: ignore
+        assert isinstance(datetime_str, str)
 
         self.pockebase.create_data_record(
             self.column_id,
