@@ -34,9 +34,10 @@ class PocketBaseInterface:
         table_name: str,
         column_name: str,
         unit: str,
-        description: str = None,
-        minimum: float = None,
-        decimal_places: int = None,
+        description: str,
+        minimum: float,
+        maximum: float,
+        decimal_places: int,
     ) -> str:
         filter_query = (
             "filter=("
@@ -65,6 +66,7 @@ class PocketBaseInterface:
             "unit": unit,
             "description": description,
             "minimum": minimum,
+            "maximum": maximum,
             "decimal_places": decimal_places,
         }
         if column_id is None:

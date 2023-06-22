@@ -16,6 +16,7 @@ class TUM_ESM_SignalClient:
         unit: str,
         description: str,
         minimum: float,
+        maximum: float,
         decimal_places: int,
     ) -> None:
         self.pockebase = tum_esm_signal.PocketBaseInterface(cms_identity, cms_password)
@@ -30,10 +31,11 @@ class TUM_ESM_SignalClient:
             collection_name,
             table_name,
             column_name,
-            unit=unit,
-            description=description,
-            minimum=minimum,
-            decimal_places=decimal_places,
+            unit,
+            description,
+            minimum,
+            maximum,
+            decimal_places,
         )
 
     def add_datapoint(self, value: float) -> None:
@@ -44,8 +46,8 @@ class TUM_ESM_SignalClient:
         datetime_str = pendulum.now("UTC").to_iso8601_string()
 
         self.pockebase.create_data_record(
-            column_id=self.column_id,
-            sensor_id=self.sensor_id,
-            value=value,
-            datetime=datetime_str,
+            self.column_id,
+            self.sensor_id,
+            value,
+            datetime_str,
         )
