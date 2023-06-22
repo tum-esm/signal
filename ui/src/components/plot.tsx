@@ -1,7 +1,7 @@
 import { CONSTANTS } from "@/utilities/constants";
 import { DataRecordType } from "@/utilities/fetching/fetch-data";
 import { generateTicks } from "@/utilities/math";
-import { plotGrid, plotLabels } from "@/utilities/plotting";
+import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";
 import { max, min } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
@@ -46,6 +46,7 @@ export function Plot(props: { data: DataRecordType[]; sensorIds: string[] }) {
             const svg = d3.select(d3ContainerRef.current);
             plotGrid(svg, xTicks, yTicks, xScale, yScale);
             plotLabels(svg, xTicks, yTicks, xScale, yScale);
+            plotData(svg, props.data, xScale, yScale, props.sensorIds);
         }
     }, [d3ContainerRef.current, props.data, xTicks, yTicks]);
 

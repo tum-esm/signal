@@ -16,7 +16,7 @@ const dataRecordSchema = z
     })
     .pick({ sensor_id: true, datetime: true, value: true })
     .transform((o) => ({
-        timestamp: new Date(o.datetime).getTime() / 1000,
+        timestamp: new Date(o.datetime).getTime(),
         value: o.value,
         sensorId: o.sensor_id,
     }));
@@ -31,12 +31,9 @@ export async function fetchData(
         .toISOString()
         .replace("T", " ")
         .substring(0, 19);
-
     const filterString =
         `signal_column = "${tableColumn.id}" && ` +
         `created >= "${minDateString}"`;
-
-    console.log({ minDateString, filterString });
 
     const resultList = await pb.collection("signal_records").getFullList({
         filter: filterString,

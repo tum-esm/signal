@@ -1,6 +1,8 @@
 import { range } from "lodash";
 import { CONSTANTS } from "./constants";
 import * as d3 from "d3";
+import { DataRecordType } from "./fetching/fetch-data";
+import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
 
 export function plotGrid(
     svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
@@ -175,4 +177,37 @@ export function plotLabels(
         .attr("font-size", 6)
         .attr("font-weight", 600)
         .text("Local Time");
+}
+
+export function plotData(
+    svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
+    data: DataRecordType[],
+    xScale: (x: number) => number,
+    yScale: (x: number) => number,
+    sensorIds: string[]
+) {
+    sensorIds.forEach((sensorId: string) => {
+        let dataSelection: any = svg.select(`.data-circles-${sensorId}`);
+
+        if (dataSelection.empty()) {
+            dataSelection = svg
+                .append("g")
+                .attr("class", `data-circles-${sensorId} text-red-500`);
+        }
+
+        const dataCirclesSelection: any = dataSelection
+            .selectAll("circle")
+            .data(data.filter((r: DataRecordType) => r.sensorId === sensorId));
+
+        dataCirclesSelection
+            .enter()
+            .append("circle")
+            .merge(dataCirclesSelection)
+            .attr("cx", (r: DataRecordType) => xScale(r.timestamp))
+            .attr("cy", (r: DataRecordType) => yScale(r.value))
+            .attr("r", 0.5)
+            .attr("fill", "currentColor");
+
+        dataCirclesSelection.exit().remove();
+    });
 }
