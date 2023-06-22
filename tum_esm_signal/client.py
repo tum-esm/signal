@@ -1,3 +1,4 @@
+from __future__ import annotations
 import tum_esm_signal
 import pendulum
 
@@ -11,25 +12,51 @@ class TUM_ESM_SignalClient:
         cms_password: str,
         collection_name: str,
         table_name: str,
-        column_name: str,
         sensor_id: str,
+    ) -> None:
+        self.pocketbase = tum_esm_signal.PocketBaseInterface(cms_identity, cms_password)
+        self.collection_name = collection_name
+        self.table_name = table_name
+        self.sensor_id = sensor_id
+
+    def connect_column(
+        self,
+        column_name: str,
+        unit: str,
+        minimum: float,
+        maximum: float,
+        decimal_places: int,
+        description: str = "",
+    ) -> TUM_ESM_SignalClient_SensorColumn:
+        return TUM_ESM_SignalClient_SensorColumn(
+            self,
+            column_name,
+            unit,
+            description,
+            minimum,
+            maximum,
+            decimal_places,
+        )
+
+
+class TUM_ESM_SignalClient_SensorColumn:
+    def __init__(
+        self,
+        signal_client: TUM_ESM_SignalClient,
+        column_name: str,
         unit: str,
         description: str,
         minimum: float,
         maximum: float,
         decimal_places: int,
     ) -> None:
-        self.pockebase = tum_esm_signal.PocketBaseInterface(cms_identity, cms_password)
-
-        self.collection_name = collection_name
-        self.table_name = table_name
-        self.sensor_id = sensor_id
+        self.signal_client = signal_client
         self.column_name = column_name
 
         # connect column id
-        self.column_id = self.pockebase.upsert_column(
-            collection_name,
-            table_name,
+        self.column_id = self.signal_client.pocketbase.upsert_column(
+            self.signal_client.collection_name,
+            self.signal_client.table_name,
             column_name,
             unit,
             description,
@@ -46,9 +73,9 @@ class TUM_ESM_SignalClient:
         datetime_str = pendulum.now("UTC").to_iso8601_string()  # type: ignore
         assert isinstance(datetime_str, str)
 
-        self.pockebase.create_data_record(
+        self.signal_client.pocketbase.create_data_record(
             self.column_id,
-            self.sensor_id,
+            self.signal_client.sensor_id,
             value,
             datetime_str,
         )
