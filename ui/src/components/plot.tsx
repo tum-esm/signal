@@ -6,50 +6,124 @@ import * as d3 from "d3";
 import { max, min } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 
-export function Plot(props: { data: DataRecordType[]; sensorIds: string[] }) {
+export function Plot(props: {
+    allData: DataRecordType[];
+    sensorIds: string[];
+    timeBin: 15 | 60 | 240 | 720;
+}) {
     const d3ContainerRef = useRef(null);
 
     const currentTimestamp = new Date().getTime();
-    const xTicks = useMemo<number[]>(
-        () =>
-            props.data.length > 0
-                ? generateTicks(
-                      currentTimestamp - 24 * 60 * 60 * 1000,
-                      currentTimestamp,
-                      11
-                  )
-                : [],
-        [props.data]
-    );
-    const yTicks = useMemo(() => {
-        const minValue = min(props.data.map((d) => d.value));
-        const maxValue = max(props.data.map((d) => d.value));
-        if (minValue === undefined || maxValue === undefined) {
-            return [];
+
+    const timeBinData: {
+        [key in 15 | 60 | 240 | 720]: DataRecordType[];
+    } = useMemo(() => {
+        function f(timeBin: 15 | 60 | 240 | 720) {
+            return props.allData.filter(
+                (d) => d.timestamp >= currentTimestamp - timeBin * 60000
+            );
         }
-        const ySpan = maxValue - minValue;
-        return generateTicks(minValue - 0.1 * ySpan, maxValue + 0.1 * ySpan, 9);
-    }, [props.data]);
+        return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
+    }, [props.allData]);
 
-    const xScale: (x: number) => number = d3
-        .scaleLinear()
-        .domain([xTicks[0], xTicks[xTicks.length - 1]])
-        .range([CONSTANTS.PLOT.xMin, CONSTANTS.PLOT.xMax]);
+    const timeBinXTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    } = useMemo(() => {
+        function f(timeBin: 15 | 60 | 240 | 720) {
+            return generateTicks(
+                currentTimestamp - timeBin * 60000,
+                currentTimestamp,
+                11
+            );
+        }
+        return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
+    }, [currentTimestamp]);
 
-    const yScale: (x: number) => number = d3
-        .scaleLinear()
-        .domain([yTicks[yTicks.length - 1], yTicks[0]])
-        .range([CONSTANTS.PLOT.yMin, CONSTANTS.PLOT.yMax]);
+    const timeBinYTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    } = useMemo(() => {
+        function f(timeBin: 15 | 60 | 240 | 720) {
+            const minValue = min(timeBinData[timeBin].map((d) => d.value));
+            const maxValue = max(timeBinData[timeBin].map((d) => d.value));
+            if (minValue === undefined || maxValue === undefined) {
+                return [];
+            }
+            const ySpan = maxValue - minValue;
+            return generateTicks(
+                minValue - 0.1 * ySpan,
+                maxValue + 0.1 * ySpan,
+                9
+            );
+        }
+
+        return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
+    }, [timeBinData]);
+
+    const timeBinXScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    } = useMemo(() => {
+        function f(timeBin: 15 | 60 | 240 | 720) {
+            return d3
+                .scaleLinear()
+                .domain([
+                    timeBinXTicks[timeBin][0],
+                    timeBinXTicks[timeBin][timeBinXTicks[timeBin].length - 1],
+                ])
+                .range([CONSTANTS.PLOT.xMin, CONSTANTS.PLOT.xMax]);
+        }
+        return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
+    }, [timeBinXTicks]);
+
+    const timeBinYScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    } = useMemo(() => {
+        function f(timeBin: 15 | 60 | 240 | 720) {
+            return d3
+                .scaleLinear()
+                .domain([
+                    timeBinYTicks[timeBin][timeBinYTicks[timeBin].length - 1],
+                    timeBinYTicks[timeBin][0],
+                ])
+                .range([CONSTANTS.PLOT.yMin, CONSTANTS.PLOT.yMax]);
+        }
+        return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
+    }, [timeBinYTicks]);
 
     useEffect(() => {
         if (d3ContainerRef.current) {
             const svg = d3.select(d3ContainerRef.current);
-            plotGrid(svg, xTicks, yTicks, xScale, yScale);
-            plotLabels(svg, xTicks, yTicks, xScale, yScale);
-            plotData(svg, props.data, xScale, yScale, props.sensorIds);
+            plotGrid(
+                svg,
+                timeBinXTicks,
+                timeBinYTicks,
+                timeBinXScale,
+                timeBinYScale
+            );
+            plotLabels(
+                svg,
+                timeBinXTicks,
+                timeBinYTicks,
+                timeBinXScale,
+                timeBinYScale
+            );
+            plotData(
+                svg,
+                timeBinData,
+                timeBinXScale,
+                timeBinYScale,
+                props.sensorIds
+            );
         }
-    }, [d3ContainerRef.current, props.data, xTicks, yTicks]);
+    }, [
+        d3ContainerRef.current,
+        timeBinData,
+        timeBinXTicks,
+        timeBinYTicks,
+        timeBinXScale,
+        timeBinYScale,
+    ]);
 
+    // TODO: do CSSing to only plot the selected time bin
     return (
         <div className="w-full p-4 bg-white">
             <svg

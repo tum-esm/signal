@@ -6,11 +6,15 @@ import { useEffect, useMemo, useState } from "react";
 import { min, mean, uniq, max } from "lodash";
 import { Plot } from "./plot";
 
-export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
-    const [data, setData] = useState<DataRecordType[]>([]);
+export function PlotPanel(props: {
+    tableColumn: TableColumnRecordType;
+    timeBin: 15 | 60 | 240 | 720;
+}) {
+    const [allData, setAllData] = useState<DataRecordType[]>([]);
+    const [timedData, setTimedData] = useState<DataRecordType[]>([]);
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
-    const sensorIds = data ? uniq(data.map((d) => d.sensorId)) : [];
+    const sensorIds = timedData ? uniq(timedData.map((d) => d.sensorId)) : [];
 
     const sensorIdMetricValues: {
         [sensorId: string]: {
@@ -21,8 +25,8 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
         };
     } = useMemo(() => {
         return sensorIds.reduce((acc, sensorId) => {
-            const values = data
-                ? data
+            const values = timedData
+                ? timedData
                       .filter((d) => d.sensorId === sensorId)
                       .map((d) => d.value)
                 : [];
@@ -36,14 +40,21 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
                 },
             };
         }, {});
-    }, [data]);
+    }, [timedData]);
 
     useEffect(() => {
         async function f() {
-            setData(await fetchData(pb, props.tableColumn));
+            setAllData(await fetchData(pb, props.tableColumn));
         }
         f();
     }, [props.tableColumn.id]);
+
+    useEffect(() => {
+        const startTimestamp = new Date(
+            new Date().getTime() - props.timeBin * 60000
+        ).getTime();
+        setTimedData(allData.filter((d) => d.timestamp >= startTimestamp));
+    }, [props.timeBin, allData]);
 
     return (
         <div
@@ -126,7 +137,11 @@ export function PlotPanel(props: { tableColumn: TableColumnRecordType }) {
                 </div>
             </div>
             <div className="flex flex-col flex-grow bg-white">
-                <Plot data={data} sensorIds={sensorIds} />
+                <Plot
+                    allData={allData}
+                    sensorIds={sensorIds}
+                    timeBin={props.timeBin}
+                />
             </div>
         </div>
     );

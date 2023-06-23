@@ -2,152 +2,193 @@ import { range } from "lodash";
 import { CONSTANTS } from "./constants";
 import * as d3 from "d3";
 import { DataRecordType } from "./fetching/fetch-data";
-import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
+
+const timeBins: (15 | 60 | 240 | 720)[] = [15, 60, 240, 720];
 
 export function plotGrid(
     svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
-    xTicks: number[],
-    yTicks: number[],
-    xScale: (x: number) => number,
-    yScale: (x: number) => number
+    timeBinXTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    },
+    timeBinYTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    },
+    timeBinXScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    },
+    timeBinYScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    }
 ) {
-    // VERICAL GRID LINES
+    timeBins.forEach((timeBin) => {
+        const xTicks: number[] = timeBinXTicks[timeBin];
+        const yTicks: number[] = timeBinYTicks[timeBin];
+        const xScale: (x: number) => number = timeBinXScale[timeBin];
+        const yScale: (x: number) => number = timeBinYScale[timeBin];
 
-    let xGridSelection: any = svg.select(".x-grid-lines");
+        // VERICAL GRID LINES
 
-    if (xGridSelection.empty()) {
-        xGridSelection = svg.append("g").attr("class", "x-grid-lines");
-    }
+        let xGridSelection: any = svg.select(`.x-grid-lines-${timeBin}`);
 
-    const xGridLinesLinesSelection: any = xGridSelection
-        .selectAll("line")
-        .data(xTicks.slice(1, xTicks.length - 1));
+        if (xGridSelection.empty()) {
+            xGridSelection = svg
+                .append("g")
+                .attr("class", `x-grid-lines-${timeBin}`);
+        }
 
-    xGridLinesLinesSelection
-        .enter()
-        .append("line")
-        .merge(xGridLinesLinesSelection)
-        .attr("x1", (value: number) => xScale(value))
-        .attr("x2", (value: number) => xScale(value))
-        .attr("y1", CONSTANTS.PLOT.yMin)
-        .attr("y2", CONSTANTS.PLOT.yMax)
-        .attr("stroke", "#cbd5e1")
-        .attr("stroke-width", 0.5)
-        .attr("stroke-linecap", "butt");
+        const xGridLinesLinesSelection: any = xGridSelection
+            .selectAll("line")
+            .data(xTicks.slice(1, xTicks.length - 1));
 
-    xGridLinesLinesSelection.exit().remove();
+        xGridLinesLinesSelection
+            .enter()
+            .append("line")
+            .merge(xGridLinesLinesSelection)
+            .attr("x1", (value: number) => xScale(value))
+            .attr("x2", (value: number) => xScale(value))
+            .attr("y1", CONSTANTS.PLOT.yMin)
+            .attr("y2", CONSTANTS.PLOT.yMax)
+            .attr("stroke", "#cbd5e1")
+            .attr("stroke-width", 0.5)
+            .attr("stroke-linecap", "butt");
 
-    // HORIZONTAL GRID LINES
+        xGridLinesLinesSelection.exit().remove();
 
-    let yGridSelection: any = svg.select(".y-grid-lines");
+        // HORIZONTAL GRID LINES
 
-    if (yGridSelection.empty()) {
-        yGridSelection = svg.append("g").attr("class", "y-grid-lines");
-    }
+        let yGridSelection: any = svg.select(`.y-grid-lines-${timeBin}`);
 
-    const yGridLinesLinesSelection: any = yGridSelection
-        .selectAll("line")
-        .data(yTicks.slice(1, yTicks.length - 1));
+        if (yGridSelection.empty()) {
+            yGridSelection = svg
+                .append("g")
+                .attr("class", `y-grid-lines-${timeBin}`);
+        }
 
-    yGridLinesLinesSelection
-        .enter()
-        .append("line")
-        .merge(yGridLinesLinesSelection)
-        .attr("x1", CONSTANTS.PLOT.xMin)
-        .attr("x2", CONSTANTS.PLOT.xMax)
-        .attr("y1", (value: number) => yScale(value))
-        .attr("y2", (value: number) => yScale(value))
-        .attr("stroke", "#cbd5e1")
-        .attr("stroke-width", 0.5)
-        .attr("stroke-linecap", "butt");
+        const yGridLinesLinesSelection: any = yGridSelection
+            .selectAll("line")
+            .data(yTicks.slice(1, yTicks.length - 1));
 
-    // GRID FRAME
+        yGridLinesLinesSelection
+            .enter()
+            .append("line")
+            .merge(yGridLinesLinesSelection)
+            .attr("x1", CONSTANTS.PLOT.xMin)
+            .attr("x2", CONSTANTS.PLOT.xMax)
+            .attr("y1", (value: number) => yScale(value))
+            .attr("y2", (value: number) => yScale(value))
+            .attr("stroke", "#cbd5e1")
+            .attr("stroke-width", 0.5)
+            .attr("stroke-linecap", "butt");
 
-    let frameSelection: any = svg.select(".grid-frame");
-    if (frameSelection.empty()) {
-        frameSelection = svg.append("g").attr("class", "grid-frame");
-    }
+        // GRID FRAME
 
-    const frameRectsSelection: any = yGridSelection
-        .selectAll("rect")
-        .data(range(1, yTicks.length - 1));
+        let frameSelection: any = svg.select(`.grid-frame-${timeBin}`);
+        if (frameSelection.empty()) {
+            frameSelection = svg
+                .append("g")
+                .attr("class", `grid-frame-${timeBin}`);
+        }
 
-    frameRectsSelection
-        .enter()
-        .append("rect")
-        .merge(frameRectsSelection)
-        .attr("x", xScale(xTicks[0]))
-        .attr("y", yScale(yTicks[yTicks.length - 1]))
-        .attr("width", CONSTANTS.PLOT.xMax - CONSTANTS.PLOT.xMin)
-        .attr("height", CONSTANTS.PLOT.yMax - CONSTANTS.PLOT.yMin)
-        .attr("fill", "none")
-        .attr("stroke", "#1e293b")
-        .attr("stroke-width", 0.5)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round");
+        const frameRectsSelection: any = yGridSelection
+            .selectAll("rect")
+            .data(range(1, yTicks.length - 1));
 
-    frameRectsSelection.exit().remove();
+        frameRectsSelection
+            .enter()
+            .append("rect")
+            .merge(frameRectsSelection)
+            .attr("x", xScale(xTicks[0]))
+            .attr("y", yScale(yTicks[yTicks.length - 1]))
+            .attr("width", CONSTANTS.PLOT.xMax - CONSTANTS.PLOT.xMin)
+            .attr("height", CONSTANTS.PLOT.yMax - CONSTANTS.PLOT.yMin)
+            .attr("fill", "none")
+            .attr("stroke", "#1e293b")
+            .attr("stroke-width", 0.5)
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round");
+
+        frameRectsSelection.exit().remove();
+    });
 }
 
 export function plotLabels(
     svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
-    xTicks: number[],
-    yTicks: number[],
-    xScale: (x: number) => number,
-    yScale: (x: number) => number
+    timeBinXTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    },
+    timeBinYTicks: {
+        [key in 15 | 60 | 240 | 720]: number[];
+    },
+    timeBinXScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    },
+    timeBinYScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    }
 ) {
-    // X LABELS
+    timeBins.forEach((timeBin) => {
+        const xTicks: number[] = timeBinXTicks[timeBin];
+        const yTicks: number[] = timeBinYTicks[timeBin];
+        const xScale: (x: number) => number = timeBinXScale[timeBin];
+        const yScale: (x: number) => number = timeBinYScale[timeBin];
 
-    let xLabelsSelection: any = svg.select(".x-labels");
+        // X LABELS
 
-    if (xLabelsSelection.empty()) {
-        xLabelsSelection = svg.append("g").attr("class", "x-labels");
-    }
+        let xLabelsSelection: any = svg.select(`.x-labels-${timeBin}`);
 
-    const xLabelsTextSelection: any = xLabelsSelection
-        .selectAll("text")
-        .data(xTicks);
+        if (xLabelsSelection.empty()) {
+            xLabelsSelection = svg
+                .append("g")
+                .attr("class", `x-labels-${timeBin}`);
+        }
 
-    xLabelsTextSelection
-        .enter()
-        .append("text")
-        .merge(xLabelsTextSelection)
-        .attr("x", (value: number) => xScale(value))
-        .attr("y", CONSTANTS.PLOT.yMax + 3)
-        .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "hanging")
-        .attr("font-size", 6)
-        .attr("fill", "#1e293b")
-        // the value is a unix timestamp, only the local time is interesting
-        .text((value: number) => new Date(value).toLocaleTimeString());
+        const xLabelsTextSelection: any = xLabelsSelection
+            .selectAll("text")
+            .data(xTicks);
 
-    xLabelsTextSelection.exit().remove();
+        xLabelsTextSelection
+            .enter()
+            .append("text")
+            .merge(xLabelsTextSelection)
+            .attr("x", (value: number) => xScale(value))
+            .attr("y", CONSTANTS.PLOT.yMax + 3)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "hanging")
+            .attr("font-size", 6)
+            .attr("fill", "#1e293b")
+            // the value is a unix timestamp, only the local time is interesting
+            .text((value: number) => new Date(value).toLocaleTimeString());
 
-    // Y LABELS
+        xLabelsTextSelection.exit().remove();
 
-    let yLabelsSelection: any = svg.select(".y-labels");
+        // Y LABELS
 
-    if (yLabelsSelection.empty()) {
-        yLabelsSelection = svg.append("g").attr("class", "y-labels");
-    }
+        let yLabelsSelection: any = svg.select(`.y-labels-${timeBin}`);
 
-    const yLabelsTextSelection: any = yLabelsSelection
-        .selectAll("text")
-        .data(yTicks.slice(1, yTicks.length - 1));
+        if (yLabelsSelection.empty()) {
+            yLabelsSelection = svg
+                .append("g")
+                .attr("class", `y-labels-${timeBin}`);
+        }
 
-    yLabelsTextSelection
-        .enter()
-        .append("text")
-        .merge(yLabelsTextSelection)
-        .attr("x", CONSTANTS.PLOT.xMin - 3)
-        .attr("y", (value: number) => yScale(value))
-        .attr("text-anchor", "end")
-        .attr("alignment-baseline", "middle")
-        .attr("fill", "#1e293b")
-        .attr("font-size", 6)
-        .text((value: number) => value.toPrecision(3));
+        const yLabelsTextSelection: any = yLabelsSelection
+            .selectAll("text")
+            .data(yTicks.slice(1, yTicks.length - 1));
 
-    yLabelsTextSelection.exit().remove();
+        yLabelsTextSelection
+            .enter()
+            .append("text")
+            .merge(yLabelsTextSelection)
+            .attr("x", CONSTANTS.PLOT.xMin - 3)
+            .attr("y", (value: number) => yScale(value))
+            .attr("text-anchor", "end")
+            .attr("alignment-baseline", "middle")
+            .attr("fill", "#1e293b")
+            .attr("font-size", 6)
+            .text((value: number) => value.toPrecision(3));
+
+        yLabelsTextSelection.exit().remove();
+    });
 
     // X AXIS TITLE
 
@@ -181,33 +222,53 @@ export function plotLabels(
 
 export function plotData(
     svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
-    data: DataRecordType[],
-    xScale: (x: number) => number,
-    yScale: (x: number) => number,
+    timeBinData: {
+        [key in 15 | 60 | 240 | 720]: DataRecordType[];
+    },
+    timeBinXScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    },
+    timeBinYScale: {
+        [key in 15 | 60 | 240 | 720]: (x: number) => number;
+    },
     sensorIds: string[]
 ) {
-    sensorIds.forEach((sensorId: string) => {
-        let dataSelection: any = svg.select(`.data-circles-${sensorId}`);
+    timeBins.forEach((timeBin) => {
+        const xScale: (x: number) => number = timeBinXScale[timeBin];
+        const yScale: (x: number) => number = timeBinYScale[timeBin];
 
-        if (dataSelection.empty()) {
-            dataSelection = svg
-                .append("g")
-                .attr("class", `data-circles-${sensorId} text-red-500`);
-        }
+        sensorIds.forEach((sensorId: string) => {
+            let dataSelection: any = svg.select(
+                `.data-circles-${sensorId}-${timeBin}`
+            );
 
-        const dataCirclesSelection: any = dataSelection
-            .selectAll("circle")
-            .data(data.filter((r: DataRecordType) => r.sensorId === sensorId));
+            if (dataSelection.empty()) {
+                dataSelection = svg
+                    .append("g")
+                    .attr(
+                        "class",
+                        `data-circles-${sensorId}-${timeBin} text-red-500`
+                    );
+            }
 
-        dataCirclesSelection
-            .enter()
-            .append("circle")
-            .merge(dataCirclesSelection)
-            .attr("cx", (r: DataRecordType) => xScale(r.timestamp))
-            .attr("cy", (r: DataRecordType) => yScale(r.value))
-            .attr("r", 0.5)
-            .attr("fill", "currentColor");
+            const dataCirclesSelection: any = dataSelection
+                .selectAll("circle")
+                .data(
+                    timeBinData[timeBin].filter(
+                        (r: DataRecordType) => r.sensorId === sensorId
+                    )
+                );
 
-        dataCirclesSelection.exit().remove();
+            dataCirclesSelection
+                .enter()
+                .append("circle")
+                .merge(dataCirclesSelection)
+                .attr("cx", (r: DataRecordType) => xScale(r.timestamp))
+                .attr("cy", (r: DataRecordType) => yScale(r.value))
+                .attr("r", 0.5)
+                .attr("fill", "currentColor");
+
+            dataCirclesSelection.exit().remove();
+        });
     });
 }

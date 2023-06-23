@@ -22,6 +22,7 @@ import {
     fetchTables,
 } from "@/utilities/fetching/fetch-tables";
 import { PlotPanel } from "@/components/plot-panel";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -44,6 +45,9 @@ export default function Page() {
               .filter((t) => t.collectionName === activeCollectionName)
               .map((t) => t.tableName)
         : [];
+
+    const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(15);
+
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
     // fetch tables on mount
@@ -98,7 +102,7 @@ export default function Page() {
                 {collectionNames !== undefined && (
                     <div
                         className={cn(
-                            "flex flex-row items-center justify-start gap-x-2"
+                            "flex flex-row items-center justify-start gap-x-2 w-full"
                         )}
                     >
                         <div className="text-base font-semibold">
@@ -145,6 +149,20 @@ export default function Page() {
                                 </Select>
                             </>
                         )}
+                        <div className="flex-grow" />
+                        <Tabs
+                            className="w-[400px]"
+                            value={timeBin.toString()}
+                            // @ts-ignore
+                            onValueChange={(v) => setTimeBin(parseInt(v))}
+                        >
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="15">15 minutes</TabsTrigger>
+                                <TabsTrigger value="60">1 hour</TabsTrigger>
+                                <TabsTrigger value="240">4 hours</TabsTrigger>
+                                <TabsTrigger value="720">12 hours</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
                     </div>
                 )}
             </header>
@@ -167,7 +185,11 @@ export default function Page() {
                 )}
                 {columns !== undefined &&
                     columns.map((c) => (
-                        <PlotPanel key={c.id} tableColumn={c} />
+                        <PlotPanel
+                            key={c.id}
+                            tableColumn={c}
+                            timeBin={timeBin}
+                        />
                     ))}
             </main>
         </>
