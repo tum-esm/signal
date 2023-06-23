@@ -240,15 +240,20 @@ export default function Page() {
                         Loading columns...
                     </div>
                 )}
-                {columns !== undefined &&
-                    columns.map((c) => (
-                        <PlotPanel
-                            key={c.id}
-                            tableColumn={c}
-                            timeBin={timeBin}
-                            refreshPeriod={refreshPeriod}
-                        />
-                    ))}
+                {columns !== undefined && (
+                    <div
+                        className={cn("grid grid-cols-1 4xl:grid-cols-2 gap-4")}
+                    >
+                        {columns.map((c) => (
+                            <PlotPanel
+                                key={c.id}
+                                tableColumn={c}
+                                timeBin={timeBin}
+                                refreshPeriod={refreshPeriod}
+                            />
+                        ))}
+                    </div>
+                )}
             </main>
         </>
     );

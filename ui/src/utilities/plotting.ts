@@ -181,7 +181,7 @@ export function plotLabels(
             .attr("alignment-baseline", "middle")
             .attr("fill", "#1e293b")
             .attr("font-size", 6)
-            .text((value: number) => value.toPrecision(3));
+            .text((value: number) => value.toPrecision(5));
 
         yLabelsTextSelection.exit().remove();
     });

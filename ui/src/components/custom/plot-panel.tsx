@@ -28,9 +28,8 @@ export function PlotPanel(props: {
 
     const sensorIdMetricValues: {
         [sensorId: string]: {
-            current: number | undefined;
             min: number | undefined;
-            avg: number | undefined;
+            current: number | undefined;
             max: number | undefined;
         };
     } = useMemo(() => {
@@ -43,10 +42,9 @@ export function PlotPanel(props: {
             return {
                 ...acc,
                 [sensorId]: {
-                    current: values[values.length - 1]?.toPrecision(4),
-                    min: min(values)?.toPrecision(4),
-                    avg: mean(values)?.toPrecision(4),
-                    max: max(values)?.toPrecision(4),
+                    min: min(values),
+                    current: values[values.length - 1],
+                    max: max(values),
                 },
             };
         }, {});
@@ -75,7 +73,7 @@ export function PlotPanel(props: {
     return (
         <div
             className={cn(
-                "w-full rounded-lg shadow-sm ",
+                "w-full rounded-lg shadow-sm",
                 "border border-slate-200",
                 "flex flex-row overflow-hidden"
             )}
@@ -83,7 +81,7 @@ export function PlotPanel(props: {
             <div
                 className={cn(
                     "flex flex-col border-r border-slate-200",
-                    "w-[24rem] min-h-[20rem] flex-shrink-0"
+                    "w-[22rem] min-h-[16rem] flex-shrink-0"
                 )}
             >
                 <h2
@@ -122,7 +120,7 @@ export function PlotPanel(props: {
                 >
                     <div
                         className={cn(
-                            "grid grid-cols-6 text-sm text-center text-slate-100 w-full"
+                            "grid grid-cols-5 text-sm text-center text-slate-100 w-full"
                         )}
                     >
                         <div
@@ -132,9 +130,9 @@ export function PlotPanel(props: {
                         >
                             sensor id
                         </div>
-                        <div>current</div>
                         <div>min</div>
-                        <div>avg</div>
+                        <div>current</div>
+
                         <div>max</div>
                     </div>
                 </div>
@@ -147,7 +145,7 @@ export function PlotPanel(props: {
                     {sensorIds.map((sensorId, index) => (
                         <div
                             className={cn(
-                                "grid grid-cols-6 text-sm text-center"
+                                "grid grid-cols-5 text-sm text-center"
                             )}
                             key={sensorId}
                         >
@@ -172,17 +170,21 @@ export function PlotPanel(props: {
                                     {sensorId.toUpperCase()}
                                 </div>
                             </div>
+
                             <div className={cn("col-span-1")}>
-                                {sensorIdMetricValues[sensorId].current}
+                                {sensorIdMetricValues[
+                                    sensorId
+                                ].min?.toPrecision(4)}
                             </div>
                             <div className={cn("col-span-1")}>
-                                {sensorIdMetricValues[sensorId].min}
+                                {sensorIdMetricValues[
+                                    sensorId
+                                ].current?.toPrecision(4)}
                             </div>
                             <div className={cn("col-span-1")}>
-                                {sensorIdMetricValues[sensorId].avg}
-                            </div>
-                            <div className={cn("col-span-1")}>
-                                {sensorIdMetricValues[sensorId].max}
+                                {sensorIdMetricValues[
+                                    sensorId
+                                ].max?.toPrecision(4)}
                             </div>
                         </div>
                     ))}
