@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utilities/class-names";
 import { DataRecordType, fetchData } from "@/utilities/fetch-data";
 import { TableColumnRecordType } from "@/utilities/fetch-table-columns";
 import PocketBase from "pocketbase";

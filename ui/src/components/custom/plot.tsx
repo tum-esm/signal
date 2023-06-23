@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utilities/class-names";
 import { CONSTANTS } from "@/utilities/constants";
 import { DataRecordType } from "@/utilities/fetch-data";
 import { generateTicks } from "@/utilities/math";

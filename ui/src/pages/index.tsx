@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/shadcnui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utilities/class-names";
 import { useEffect, useMemo, useState } from "react";
 import {
     TableColumnRecordType,
