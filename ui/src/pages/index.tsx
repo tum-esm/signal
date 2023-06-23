@@ -23,6 +23,12 @@ import {
 } from "@/utilities/fetching/fetch-tables";
 import { PlotPanel } from "@/components/plot-panel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    TablerIconTimeDuration10,
+    TablerIconTimeDuration30,
+    TablerIconTimeDuration60,
+    TablerIconTimeDurationOff,
+} from "@/components/icons";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -47,6 +53,18 @@ export default function Page() {
         : [];
 
     const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(60);
+    const [refreshPeriod, setRefreshPeriod] = useState<-1 | 10 | 30 | 60>(-1);
+    function updateRefreshPeriod() {
+        if (refreshPeriod === -1) {
+            setRefreshPeriod(10);
+        } else if (refreshPeriod === 10) {
+            setRefreshPeriod(30);
+        } else if (refreshPeriod === 30) {
+            setRefreshPeriod(60);
+        } else if (refreshPeriod === 60) {
+            setRefreshPeriod(-1);
+        }
+    }
 
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
@@ -105,9 +123,7 @@ export default function Page() {
                             "flex flex-row items-center justify-start gap-x-2 w-full"
                         )}
                     >
-                        <div className="text-base font-semibold">
-                            Collection:
-                        </div>
+                        <div className="text-base font-medium">Collection</div>
                         <Select
                             onValueChange={(v) => setActiveCollectionName(v)}
                             value={activeCollectionName}
@@ -127,8 +143,8 @@ export default function Page() {
                         </Select>
                         {activeCollectionName !== undefined && (
                             <>
-                                <div className="pl-6 text-base font-semibold">
-                                    Table:
+                                <div className="text-base font-medium">
+                                    Table
                                 </div>
                                 <Select
                                     onValueChange={(v) => setActiveTableName(v)}
@@ -150,6 +166,7 @@ export default function Page() {
                             </>
                         )}
                         <div className="flex-grow" />
+                        <div className="w-px h-16 mx-3 bg-slate-200" />
                         <Tabs
                             className="w-[400px]"
                             value={timeBin.toString()}
@@ -163,6 +180,39 @@ export default function Page() {
                                 <TabsTrigger value="720">12 hours</TabsTrigger>
                             </TabsList>
                         </Tabs>
+                        <div className="w-px h-16 mx-3 bg-slate-200" />
+                        <div className="text-base font-medium">Refresh</div>
+                        <button
+                            className={cn(
+                                "p-2 rounded-md shadow-sm w-[3.75rem] h-9",
+                                "border border-slate-200 hover:bg-slate-50 hover:shadow",
+                                "flex flex-row items-center justify-center gap-x-3"
+                            )}
+                            onClick={updateRefreshPeriod}
+                            title="refresh period"
+                        >
+                            {refreshPeriod === -1 && (
+                                <TablerIconTimeDurationOff />
+                            )}
+                            {refreshPeriod === 10 && (
+                                <TablerIconTimeDuration10 />
+                            )}
+                            {refreshPeriod === 30 && (
+                                <TablerIconTimeDuration30 />
+                            )}
+                            {refreshPeriod === 60 && (
+                                <TablerIconTimeDuration60 />
+                            )}
+                            {refreshPeriod === -1 && (
+                                <div className="relative flex-shrink-0 w-2 h-2 mr-1 rounded-full bg-slate-400" />
+                            )}
+                            {refreshPeriod !== -1 && (
+                                <div className="relative flex-shrink-0 w-2 h-2 mr-1">
+                                    <div className="absolute top-0 right-0 w-2 h-2 bg-teal-500 rounded-full animate-ping" />
+                                    <div className="absolute w-2 h-2 bg-teal-500 rounded-full" />
+                                </div>
+                            )}
+                        </button>
                     </div>
                 )}
             </header>
