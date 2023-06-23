@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     TableColumnRecordType,
     fetchTableColumns,
@@ -45,12 +45,19 @@ export default function Page() {
         undefined
     );
 
-    const collectionNames = tables ? tables.map((t) => t.collectionName) : [];
-    const tableNames = tables
-        ? tables
-              .filter((t) => t.collectionName === activeCollectionName)
-              .map((t) => t.tableName)
-        : [];
+    const collectionNames = useMemo(() => {
+        return tables ? tables.map((t) => t.collectionName) : [];
+    }, [tables]);
+
+    const tableNames = useMemo(
+        () =>
+            tables
+                ? tables
+                      .filter((t) => t.collectionName === activeCollectionName)
+                      .map((t) => t.tableName)
+                : [],
+        [tables, activeCollectionName]
+    );
 
     const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(60);
     const [refreshPeriod, setRefreshPeriod] = useState<-1 | 10 | 30 | 60>(-1);
@@ -66,7 +73,10 @@ export default function Page() {
         }
     }
 
-    const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
+    const pb = useMemo(
+        () => new PocketBase("https://esm-linode.dostuffthatmatters.dev"),
+        []
+    );
 
     // fetch tables on mount
     useEffect(() => {
@@ -74,7 +84,7 @@ export default function Page() {
             setTables(await fetchTables(pb));
         }
         f();
-    }, []);
+    }, [pb]);
 
     // when tables change, set activeCollectionName to undefined
     useEffect(() => {
@@ -83,7 +93,7 @@ export default function Page() {
         } else {
             setActiveCollectionName(undefined);
         }
-    }, [JSON.stringify(collectionNames)]);
+    }, [collectionNames]);
 
     useEffect(() => {
         if (tableNames.length === 1) {
@@ -91,7 +101,7 @@ export default function Page() {
         } else {
             setActiveTableName(undefined);
         }
-    }, [JSON.stringify(tableNames)]);
+    }, [tableNames]);
 
     // when tableName changes, fetch columns
     useEffect(() => {
@@ -110,7 +120,7 @@ export default function Page() {
             }
         };
         f();
-    }, [activeCollectionName, activeTableName]);
+    }, [pb, activeCollectionName, activeTableName]);
 
     return (
         <>

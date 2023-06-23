@@ -15,11 +15,16 @@ export function PlotPanel(props: {
     const [timedData, setTimedData] = useState<DataRecordType[]>([]);
     const [refreshIsRunning, setRefreshIsRunning] = useState(false);
 
-    const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
+    const pb = useMemo(
+        () => new PocketBase("https://esm-linode.dostuffthatmatters.dev"),
+        []
+    );
 
-    const sensorIds = timedData
-        ? sortedUniq(timedData.map((d) => d.sensorId).sort())
-        : [];
+    const sensorIds = useMemo(() => {
+        return timedData
+            ? sortedUniq(timedData.map((d) => d.sensorId).sort())
+            : [];
+    }, [timedData]);
 
     const sensorIdMetricValues: {
         [sensorId: string]: {
@@ -45,7 +50,7 @@ export function PlotPanel(props: {
                 },
             };
         }, {});
-    }, [timedData]);
+    }, [timedData, sensorIds]);
 
     useEffect(() => {
         async function f() {
@@ -58,7 +63,7 @@ export function PlotPanel(props: {
             const interval = setInterval(f, props.refreshPeriod * 1000);
             return () => clearInterval(interval);
         }
-    }, [props.tableColumn.id, props.refreshPeriod]);
+    }, [props.tableColumn, props.refreshPeriod, pb]);
 
     useEffect(() => {
         const startTimestamp = new Date(
@@ -144,6 +149,7 @@ export function PlotPanel(props: {
                             className={cn(
                                 "grid grid-cols-6 text-sm text-center"
                             )}
+                            key={sensorId}
                         >
                             <div
                                 className={cn(

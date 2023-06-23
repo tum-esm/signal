@@ -25,7 +25,7 @@ export function Plot(props: {
             );
         }
         return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
-    }, [props.allData]);
+    }, [props.allData, currentTimestamp]);
 
     const timeBinXTicks: {
         [key in 15 | 60 | 240 | 720]: number[];
@@ -116,12 +116,13 @@ export function Plot(props: {
             );
         }
     }, [
-        d3ContainerRef.current,
+        d3ContainerRef,
         timeBinData,
         timeBinXTicks,
         timeBinYTicks,
         timeBinXScale,
         timeBinYScale,
+        props.sensorIds,
     ]);
 
     // TODO: do CSSing to only plot the selected time bin
