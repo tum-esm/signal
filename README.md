@@ -1,7 +1,8 @@
-
 # TUM ESM Signal
 
-Replaces the `shareable-timeseries-visualization` repository.
+🔥 Replaces https://github.com/tum-esm/shareable-timeseries-visualization
+
+<br/>
 
 **Installation:**
 
@@ -10,6 +11,8 @@ poetry add tum-esm-signal
 # or
 pip install tum-esm-signal
 ```
+
+<br/>
 
 **Usage:**
 
