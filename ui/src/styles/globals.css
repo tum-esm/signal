@@ -92,3 +92,67 @@
 .time-bin-720-hidden .time-bin-720 {
     @apply hidden;
 }
+
+.data-circles-sensor-1 {
+    @apply text-rose-500;
+}
+
+.data-circles-sensor-2 {
+    @apply text-orange-500;
+}
+
+.data-circles-sensor-3 {
+    @apply text-yellow-500;
+}
+
+.data-circles-sensor-4 {
+    @apply text-green-500;
+}
+
+.data-circles-sensor-5 {
+    @apply text-teal-500;
+}
+
+.data-circles-sensor-6 {
+    @apply text-sky-500;
+}
+
+.data-circles-sensor-7 {
+    @apply text-indigo-500;
+}
+
+.data-circles-sensor-8 {
+    @apply text-purple-500;
+}
+
+.data-circles-sensor-9 {
+    @apply text-pink-500;
+}
+
+.data-circles-sensor-10 {
+    @apply text-amber-500;
+}
+
+.data-circles-sensor-11 {
+    @apply text-lime-500;
+}
+
+.data-circles-sensor-12 {
+    @apply text-emerald-500;
+}
+
+.data-circles-sensor-13 {
+    @apply text-cyan-500;
+}
+
+.data-circles-sensor-14 {
+    @apply text-blue-500;
+}
+
+.data-circles-sensor-15 {
+    @apply text-violet-500;
+}
+
+.data-circles-sensor-16 {
+    @apply text-fuchsia-500;
+}

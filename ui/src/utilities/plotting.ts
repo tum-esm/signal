@@ -241,15 +241,26 @@ export function plotData(
         const xScale: (x: number) => number = timeBinXScale[timeBin];
         const yScale: (x: number) => number = timeBinYScale[timeBin];
 
-        sensorIds.forEach((sensorId: string) => {
+        let circleSize: number = 0;
+        if (timeBin === 15) {
+            circleSize = 1.3;
+        } else if (timeBin === 60) {
+            circleSize = 0.9;
+        } else if (timeBin === 240) {
+            circleSize = 0.6;
+        } else {
+            circleSize = 0.4;
+        }
+
+        sensorIds.forEach((sensorId: string, index: number) => {
             let dataSelection: any = timeBinGroupSelection.select(
-                `.data-circles-${sensorId}`
+                `.data-circles-sensor-${index + 1}`
             );
 
             if (dataSelection.empty()) {
                 dataSelection = timeBinGroupSelection
                     .append("g")
-                    .attr("class", `data-circles-${sensorId} text-red-500`);
+                    .attr("class", `data-circles-sensor-${index + 1}`);
             }
 
             const dataCirclesSelection: any = dataSelection
@@ -266,8 +277,12 @@ export function plotData(
                 .merge(dataCirclesSelection)
                 .attr("cx", (r: DataRecordType) => xScale(r.timestamp))
                 .attr("cy", (r: DataRecordType) => yScale(r.value))
-                .attr("r", 0.5)
-                .attr("fill", "currentColor");
+                .attr("r", circleSize)
+                .attr("fill", (r: DataRecordType) =>
+                    xScale(r.timestamp) > CONSTANTS.PLOT.xMin
+                        ? "currentColor"
+                        : "none"
+                );
 
             dataCirclesSelection.exit().remove();
         });
