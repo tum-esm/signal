@@ -61,7 +61,7 @@ export default function Page() {
             setRefreshPeriod(30);
         } else if (refreshPeriod === 30) {
             setRefreshPeriod(60);
-        } else if (refreshPeriod === 60) {
+        } else {
             setRefreshPeriod(-1);
         }
     }
@@ -239,6 +239,7 @@ export default function Page() {
                             key={c.id}
                             tableColumn={c}
                             timeBin={timeBin}
+                            refreshPeriod={refreshPeriod}
                         />
                     ))}
             </main>

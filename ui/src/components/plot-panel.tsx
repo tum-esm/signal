@@ -3,15 +3,18 @@ import { DataRecordType, fetchData } from "@/utilities/fetching/fetch-data";
 import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
 import PocketBase from "pocketbase";
 import { useEffect, useMemo, useState } from "react";
-import { min, mean, sortedUniq, max, concat } from "lodash";
+import { min, mean, sortedUniq, max } from "lodash";
 import { Plot } from "./plot";
 
 export function PlotPanel(props: {
     tableColumn: TableColumnRecordType;
     timeBin: 15 | 60 | 240 | 720;
+    refreshPeriod: -1 | 10 | 30 | 60;
 }) {
     const [allData, setAllData] = useState<DataRecordType[]>([]);
     const [timedData, setTimedData] = useState<DataRecordType[]>([]);
+    const [refreshIsRunning, setRefreshIsRunning] = useState(false);
+
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
     const sensorIds = timedData
@@ -46,10 +49,16 @@ export function PlotPanel(props: {
 
     useEffect(() => {
         async function f() {
+            setRefreshIsRunning(true);
             setAllData(await fetchData(pb, props.tableColumn));
+            setRefreshIsRunning(false);
         }
         f();
-    }, [props.tableColumn.id]);
+        if (props.refreshPeriod !== -1) {
+            const interval = setInterval(f, props.refreshPeriod * 1000);
+            return () => clearInterval(interval);
+        }
+    }, [props.tableColumn.id, props.refreshPeriod]);
 
     useEffect(() => {
         const startTimestamp = new Date(
@@ -75,7 +84,7 @@ export function PlotPanel(props: {
                 <h2
                     className={cn(
                         "flex flex-col px-4 py-2 bg-slate-800",
-                        "gap-y-1"
+                        "gap-y-1 relative"
                     )}
                 >
                     <span className="text-xl whitespace-nowrap">
@@ -91,6 +100,14 @@ export function PlotPanel(props: {
                             {props.tableColumn.description}
                         </p>
                     )}
+                    <div
+                        className={cn(
+                            "absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full",
+                            refreshIsRunning
+                                ? "animate-pulse bg-slate-200"
+                                : "bg-slate-600"
+                        )}
+                    />
                 </h2>
                 <div
                     className={cn(
