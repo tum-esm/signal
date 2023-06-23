@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { CONSTANTS } from "@/utilities/constants";
-import { DataRecordType } from "@/utilities/fetching/fetch-data";
+import { DataRecordType } from "@/utilities/fetch-data";
 import { generateTicks } from "@/utilities/math";
 import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";

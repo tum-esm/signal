@@ -1,7 +1,6 @@
-import { range } from "lodash";
 import { CONSTANTS } from "./constants";
 import * as d3 from "d3";
-import { DataRecordType } from "./fetching/fetch-data";
+import { DataRecordType } from "./fetch-data";
 
 const timeBins: (15 | 60 | 240 | 720)[] = [15, 60, 240, 720];
 

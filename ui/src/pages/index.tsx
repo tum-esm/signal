@@ -10,25 +10,22 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/components/shadcnui/select";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import {
     TableColumnRecordType,
     fetchTableColumns,
-} from "@/utilities/fetching/fetch-table-columns";
-import {
-    TableRecordType,
-    fetchTables,
-} from "@/utilities/fetching/fetch-tables";
-import { PlotPanel } from "@/components/plot-panel";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/utilities/fetch-table-columns";
+import { TableRecordType, fetchTables } from "@/utilities/fetch-tables";
+import { PlotPanel } from "@/components/custom/plot-panel";
+import { Tabs, TabsList, TabsTrigger } from "@/components/shadcnui/tabs";
 import {
     TablerIconTimeDuration10,
     TablerIconTimeDuration30,
     TablerIconTimeDuration60,
     TablerIconTimeDurationOff,
-} from "@/components/icons";
+} from "@/components/custom/icons";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
