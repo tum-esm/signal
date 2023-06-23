@@ -260,7 +260,12 @@ export function plotData(
             if (dataSelection.empty()) {
                 dataSelection = timeBinGroupSelection
                     .append("g")
-                    .attr("class", `data-circles-sensor-${index + 1}`);
+                    .attr(
+                        "class",
+                        `data-circles-sensor-${index + 1} circle-color-sensor-${
+                            index + 1
+                        }`
+                    );
             }
 
             const dataCirclesSelection: any = dataSelection

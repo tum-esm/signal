@@ -46,7 +46,7 @@ export default function Page() {
               .map((t) => t.tableName)
         : [];
 
-    const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(15);
+    const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(60);
 
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 

@@ -3,7 +3,7 @@ import { DataRecordType, fetchData } from "@/utilities/fetching/fetch-data";
 import { TableColumnRecordType } from "@/utilities/fetching/fetch-table-columns";
 import PocketBase from "pocketbase";
 import { useEffect, useMemo, useState } from "react";
-import { min, mean, uniq, max } from "lodash";
+import { min, mean, sortedUniq, max, concat } from "lodash";
 import { Plot } from "./plot";
 
 export function PlotPanel(props: {
@@ -14,7 +14,9 @@ export function PlotPanel(props: {
     const [timedData, setTimedData] = useState<DataRecordType[]>([]);
     const pb = new PocketBase("https://esm-linode.dostuffthatmatters.dev");
 
-    const sensorIds = timedData ? uniq(timedData.map((d) => d.sensorId)) : [];
+    const sensorIds = timedData
+        ? sortedUniq(timedData.map((d) => d.sensorId).sort())
+        : [];
 
     const sensorIdMetricValues: {
         [sensorId: string]: {
@@ -101,7 +103,11 @@ export function PlotPanel(props: {
                             "grid grid-cols-6 text-sm text-center text-slate-100 w-full"
                         )}
                     >
-                        <div className={cn("font-semibold col-span-2")}>
+                        <div
+                            className={cn(
+                                "font-semibold col-span-2 text-left w-full pl-[1.25rem]"
+                            )}
+                        >
                             sensor id
                         </div>
                         <div>current</div>
@@ -110,15 +116,38 @@ export function PlotPanel(props: {
                         <div>max</div>
                     </div>
                 </div>
-                <div className={cn("w-full flex-grow bg-slate-100 p-4")}>
-                    {sensorIds.map((sensorId) => (
+                <div
+                    className={cn(
+                        "w-full flex-grow bg-slate-100 p-4",
+                        "flex flex-col gap-y-2"
+                    )}
+                >
+                    {sensorIds.map((sensorId, index) => (
                         <div
                             className={cn(
                                 "grid grid-cols-6 text-sm text-center"
                             )}
                         >
-                            <div className={cn("col-span-2 font-semibold")}>
-                                {sensorId}
+                            <div
+                                className={cn(
+                                    "col-span-2 font-semibold flex flex-row ",
+                                    "items-center justify-start w-full"
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        "w-3 h-3 rounded",
+                                        `bg-color-sensor-${index + 1}`
+                                    )}
+                                />
+                                <div
+                                    className={cn(
+                                        "ml-2",
+                                        `text-color-sensor-${index + 1}`
+                                    )}
+                                >
+                                    {sensorId.toUpperCase()}
+                                </div>
                             </div>
                             <div className={cn("col-span-1")}>
                                 {sensorIdMetricValues[sensorId].current}
