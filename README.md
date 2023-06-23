@@ -17,24 +17,27 @@ pip install tum-esm-signal
 from tum_esm_signal import TUM_ESM_SignalClient
 
 signal_client = TUM_ESM_SignalClient(
-    cms_identity=cms_identity, cms_password=cms_password,
+    cms_identity="username", cms_password="password",
     collection_name="test", table_name="test",
-    sensor_id="test",
 )
 
-data_column_co2 = signal_client.connect_column(
-    column_name="co2", unit="ppm",
+signal_column_co2 = signal_client.connect_column(
+    column_name="CO₂", unit="ppm",
     minimum=350, maximum=4000, decimal_places=0,
+    description="Carbon Dioxide",
 )
-data_column_ch4 = signal_client.connect_column(
-    column_name="ch4", unit="ppm",
+signal_column_ch4 = signal_client.connect_column(
+    column_name="CH₄", unit="ppm",
     minimum=1.6, maximum=3.0, decimal_places=2,
     description="Methane",
 )
 
 while True:
     print("Sending datapoints")
-    data_column_co2.add_datapoint(random.randint(350, 4000))
-    data_column_ch4.add_datapoint(random.random() * 1.4 + 1.6)
-    time.sleep(2)
+    signal_column_co2.add_datapoint("node_1", random.random() * 5 + 400)
+    signal_column_co2.add_datapoint("node_2", random.random() * 5 + 410)
+    signal_column_ch4.add_datapoint("node_1", random.random() * 0.1 + 1.7)
+    signal_column_ch4.add_datapoint("node_2", random.random() * 0.1 + 1.9)
+    time.sleep(15)
+
 ```

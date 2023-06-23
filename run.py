@@ -46,4 +46,4 @@ while True:
     signal_column_co2.add_datapoint("node_2", random.random() * 5 + 410)
     signal_column_ch4.add_datapoint("node_1", random.random() * 0.1 + 1.7)
     signal_column_ch4.add_datapoint("node_2", random.random() * 0.1 + 1.9)
-    time.sleep(2)
+    time.sleep(15)
