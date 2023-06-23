@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { CONSTANTS } from "@/utilities/constants";
 import { DataRecordType } from "@/utilities/fetching/fetch-data";
 import { generateTicks } from "@/utilities/math";
@@ -125,7 +126,15 @@ export function Plot(props: {
 
     // TODO: do CSSing to only plot the selected time bin
     return (
-        <div className="w-full p-4 bg-white">
+        <div
+            className={cn(
+                "w-full p-4 bg-white",
+                props.timeBin !== 15 ? "time-bin-15-hidden" : "",
+                props.timeBin !== 60 ? "time-bin-60-hidden" : "",
+                props.timeBin !== 240 ? "time-bin-240-hidden" : "",
+                props.timeBin !== 720 ? "time-bin-720-hidden" : ""
+            )}
+        >
             <svg
                 className="relative z-0 rounded no-selection"
                 ref={d3ContainerRef}

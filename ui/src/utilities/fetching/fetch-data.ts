@@ -27,7 +27,7 @@ export async function fetchData(
     pb: PocketBase,
     tableColumn: TableColumnRecordType
 ): Promise<DataRecordType[]> {
-    const minDateString = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const minDateString = new Date(Date.now() - 720 * 60 * 1000)
         .toISOString()
         .replace("T", " ")
         .substring(0, 19);
