@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import PocketBase from "pocketbase";
-
 const inter = Inter({ subsets: ["latin"] });
 
 import {
@@ -30,6 +29,7 @@ import {
     LayoutCookieElementType,
     LayoutCookieType,
 } from "@/utilities/layout-cookies";
+import { findIndex } from "lodash";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -126,9 +126,26 @@ export default function Page() {
     >();
     // TODO: load layout cookie
 
-    // TODO: determine cookie of currently visible table if exists
     const currentLayoutCookieElement: LayoutCookieElementType | undefined =
-        undefined;
+        useMemo(() => {
+            if (
+                layoutCookie === undefined ||
+                activeCollectionName === undefined ||
+                activeTableName === undefined
+            ) {
+                return undefined;
+            }
+            const index = findIndex(
+                layoutCookie,
+                (lce) =>
+                    lce.collectionName == activeCollectionName &&
+                    lce.tableName == activeTableName
+            );
+            if (index === -1) {
+                return undefined;
+            }
+            return layoutCookie[index];
+        }, [layoutCookie, activeCollectionName, activeTableName]);
 
     return (
         <>
@@ -251,8 +268,14 @@ export default function Page() {
                         Loading columns...
                     </div>
                 )}
-                {columns !== undefined && (
-                    <div
+                {activeTableName !== undefined &&
+                    layoutCookie === undefined && (
+                        <div className="mx-6 my-6 text-base font-semibold">
+                            Loading layout...
+                        </div>
+                    )}
+                {columns !== undefined && layoutCookie !== undefined && (
+                    /* TODO: add component "PlotLayout */ <div
                         className={cn("grid grid-cols-1 4xl:grid-cols-2 gap-4")}
                     >
                         {columns.map((c) => (
