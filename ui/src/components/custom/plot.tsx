@@ -4,8 +4,49 @@ import { DataRecordType } from "@/utilities/fetch-data";
 import { generateTicks } from "@/utilities/math";
 import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";
-import { max, min } from "lodash";
+import { concat, max, mean, meanBy, min, range } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
+
+function smoothData(
+    data: DataRecordType[],
+    timeBin: 15 | 60 | 240 | 720,
+    sensorIds: string[],
+    currentTimestamp: number
+) {
+    if (data.length === 0 || timeBin === 15 || timeBin === 60) {
+        return data;
+    }
+    const intervalLength = timeBin === 240 ? 1 : 1;
+    const lastTimestamp = Math.floor(currentTimestamp / 60000) * 60000;
+    const timestamps = range(
+        lastTimestamp - timeBin * 60000,
+        lastTimestamp,
+        intervalLength * 60000
+    );
+    return concat(
+        ...sensorIds.map((sensorId) => {
+            const dataFilteredBySensor = data.filter(
+                (d) => d.sensorId === sensorId
+            );
+            return timestamps
+                .map((timestamp) => ({
+                    timestamp: timestamp + intervalLength * 30000,
+                    value: mean(
+                        dataFilteredBySensor
+                            .filter(
+                                (d) =>
+                                    d.timestamp >= timestamp &&
+                                    d.timestamp <
+                                        timestamp + intervalLength * 60000
+                            )
+                            .map((d) => d.value)
+                    ),
+                    sensorId: sensorId,
+                }))
+                .filter((d) => !isNaN(d.value));
+        })
+    );
+}
 
 export function Plot(props: {
     allData: DataRecordType[];
@@ -16,12 +57,19 @@ export function Plot(props: {
 
     const currentTimestamp = new Date().getTime();
 
+    console.log(`Plot render ${new Date().getTime()}`);
+
     const timeBinData: {
         [key in 15 | 60 | 240 | 720]: DataRecordType[];
     } = useMemo(() => {
         function f(timeBin: 15 | 60 | 240 | 720) {
-            return props.allData.filter(
-                (d) => d.timestamp >= currentTimestamp - timeBin * 60000
+            return smoothData(
+                props.allData.filter(
+                    (d) => d.timestamp >= currentTimestamp - timeBin * 60000
+                ),
+                timeBin,
+                props.sensorIds,
+                currentTimestamp
             );
         }
         return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };

@@ -242,13 +242,13 @@ export function plotData(
 
         let circleSize: number = 0;
         if (timeBin === 15) {
-            circleSize = 1.3;
+            circleSize = 1.2;
         } else if (timeBin === 60) {
-            circleSize = 0.9;
+            circleSize = 1.0;
         } else if (timeBin === 240) {
-            circleSize = 0.6;
+            circleSize = 0.8;
         } else {
-            circleSize = 0.4;
+            circleSize = 0.6;
         }
 
         sensorIds.forEach((sensorId: string, index: number) => {

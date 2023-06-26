@@ -12,7 +12,6 @@ import {
 import { cn } from "@/utilities/class-names";
 import { useEffect, useMemo, useState } from "react";
 import { TableRecordType, fetchTables } from "@/utilities/fetch-tables";
-import { PlotPanel } from "@/components/custom/plot-panel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcnui/tabs";
 import {
     TablerIconTimeDuration10,
@@ -20,7 +19,7 @@ import {
     TablerIconTimeDuration60,
     TablerIconTimeDurationOff,
 } from "@/components/custom/icons";
-import { LayoutCookieType } from "@/utilities/layout-cookies";
+import { LayoutCookieType, loadLayoutCookie } from "@/utilities/layout-cookies";
 import { PlotGrid } from "@/components/custom/plot-grid";
 
 export default function Page() {
@@ -92,7 +91,9 @@ export default function Page() {
     const [layoutCookie, setLayoutCookie] = useState<
         LayoutCookieType | undefined
     >();
-    // TODO: load layout cookie
+    useEffect(() => {
+        setLayoutCookie(loadLayoutCookie());
+    }, []);
 
     return (
         <>
