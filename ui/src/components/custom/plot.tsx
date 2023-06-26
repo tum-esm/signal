@@ -1,6 +1,6 @@
 import { cn } from "@/utilities/class-names";
 import { CONSTANTS } from "@/utilities/constants";
-import { DataRecordType } from "@/utilities/fetch-data";
+import { DataRecordType } from "@/utilities/fetching/data";
 import { generateTicks } from "@/utilities/math";
 import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";
@@ -73,7 +73,7 @@ export function Plot(props: {
             );
         }
         return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
-    }, [props.allData, currentTimestamp]);
+    }, [props.allData, currentTimestamp, props.sensorIds]);
 
     const timeBinXTicks: {
         [key in 15 | 60 | 240 | 720]: number[];

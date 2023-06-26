@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import {
     TableColumnRecordType,
     fetchTableColumns,
-} from "@/utilities/fetch-table-columns";
+} from "@/utilities/fetching/columns";
 import PocketBase from "pocketbase";
 import { findIndex } from "lodash";
 import { cn } from "@/utilities/class-names";
