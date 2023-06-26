@@ -1,6 +1,5 @@
 import { z } from "zod";
-import PocketBase from "pocketbase";
-import { fetchAuthToken } from "./auth";
+import { fetchFullList } from "./fetch-full-list";
 
 const tableRecordSchema = z
     .object({
@@ -20,22 +19,9 @@ const tableRecordSchema = z
 
 export type TableRecordType = z.infer<typeof tableRecordSchema>;
 
-export async function fetchTables(pb: PocketBase): Promise<TableRecordType[]> {
-    const authToken = await fetchAuthToken();
-    const response = await (
-        await fetch(
-            `https://esm-linode.dostuffthatmatters.dev/api/collections/signal_tables/records?perPage=256`,
-            {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-            }
-        )
-    ).json();
-
-    const pageCount = response.totalPages;
-    const resultsList: TableRecordType[] = response.items.map((t: any) =>
-        tableRecordSchema.parse(t)
-    );
+export async function fetchTables(): Promise<TableRecordType[]> {
+    const resultsList: TableRecordType[] = (
+        await fetchFullList("signal_tables")
+    ).map((t: any) => tableRecordSchema.parse(t));
     return resultsList;
 }

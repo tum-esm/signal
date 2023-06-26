@@ -1,9 +1,8 @@
 import { cn } from "@/utilities/class-names";
 import { DataRecordType, fetchData } from "@/utilities/fetching/data";
 import { TableColumnRecordType } from "@/utilities/fetching/columns";
-import PocketBase from "pocketbase";
 import { useEffect, useMemo, useState } from "react";
-import { min, mean, sortedUniq, max } from "lodash";
+import { min, sortedUniq, max } from "lodash";
 import { Plot } from "./plot";
 
 export function PlotPanel(props: {
@@ -13,12 +12,8 @@ export function PlotPanel(props: {
 }) {
     const [allData, setAllData] = useState<DataRecordType[]>([]);
     const [timedData, setTimedData] = useState<DataRecordType[]>([]);
+    const [refreshIsDue, setRefreshIsDue] = useState(true);
     const [refreshIsRunning, setRefreshIsRunning] = useState(false);
-
-    const pb = useMemo(
-        () => new PocketBase("https://esm-linode.dostuffthatmatters.dev"),
-        []
-    );
 
     const sensorIds = useMemo(() => {
         return timedData
@@ -51,17 +46,26 @@ export function PlotPanel(props: {
     }, [timedData, sensorIds]);
 
     useEffect(() => {
-        async function f() {
+        async function updateAllData() {
             setRefreshIsRunning(true);
-            setAllData(await fetchData(pb, props.tableColumn));
+            setAllData(await fetchData(props.tableColumn));
             setRefreshIsRunning(false);
+            setRefreshIsDue(false);
         }
-        f();
+        if (refreshIsDue && !refreshIsRunning) {
+            updateAllData();
+        }
+    }, [props.tableColumn, refreshIsRunning, refreshIsDue]);
+
+    useEffect(() => {
         if (props.refreshPeriod !== -1) {
-            const interval = setInterval(f, props.refreshPeriod * 1000);
+            const interval = setInterval(
+                () => setRefreshIsDue(true),
+                props.refreshPeriod * 1000
+            );
             return () => clearInterval(interval);
         }
-    }, [props.tableColumn, props.refreshPeriod, pb]);
+    }, [props.refreshPeriod]);
 
     useEffect(() => {
         const startTimestamp = new Date(

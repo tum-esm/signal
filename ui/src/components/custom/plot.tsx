@@ -4,7 +4,7 @@ import { DataRecordType } from "@/utilities/fetching/data";
 import { generateTicks } from "@/utilities/math";
 import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";
-import { concat, max, mean, meanBy, min, range } from "lodash";
+import { concat, max, mean, min, range } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 
 function smoothData(

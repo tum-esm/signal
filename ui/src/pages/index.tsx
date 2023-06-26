@@ -1,5 +1,4 @@
 import { Inter } from "next/font/google";
-import PocketBase from "pocketbase";
 const inter = Inter({ subsets: ["latin"] });
 import {
     Select,
@@ -58,18 +57,13 @@ export default function Page() {
         }
     }
 
-    const pb = useMemo(
-        () => new PocketBase("https://esm-linode.dostuffthatmatters.dev"),
-        []
-    );
-
     // fetch tables on mount
     useEffect(() => {
         async function f() {
-            setTables(await fetchTables(pb));
+            setTables(await fetchTables());
         }
         f();
-    }, [pb]);
+    }, []);
 
     // when tables change, set activeCollectionName to undefined
     useEffect(() => {
@@ -222,7 +216,6 @@ export default function Page() {
                             )}
                             {layoutCookie !== undefined && (
                                 <PlotGrid
-                                    pb={pb}
                                     layoutCookie={layoutCookie}
                                     collectionName={activeCollectionName}
                                     tableName={activeTableName}
