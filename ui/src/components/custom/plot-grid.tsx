@@ -8,12 +8,10 @@ import {
     TableColumnRecordType,
     fetchTableColumns,
 } from "@/utilities/fetching/columns";
-import PocketBase from "pocketbase";
 import { findIndex } from "lodash";
 import { cn } from "@/utilities/class-names";
 
 export function PlotGrid(props: {
-    pb: PocketBase;
     layoutCookie: LayoutCookieType;
     collectionName: string;
     tableName: string;
@@ -37,7 +35,6 @@ export function PlotGrid(props: {
             ) {
                 setColumns(
                     await fetchTableColumns(
-                        props.pb,
                         props.collectionName,
                         props.tableName
                     )
@@ -45,7 +42,7 @@ export function PlotGrid(props: {
             }
         };
         f();
-    }, [props.pb, props.collectionName, props.tableName]);
+    }, [props.collectionName, props.tableName]);
 
     useEffect(() => {
         if (columns !== undefined) {
