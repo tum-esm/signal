@@ -13,5 +13,14 @@ const layoutCookieElementSchema = z.object({
 });
 
 const layoutCookieSchema = z.array(layoutCookieElementSchema);
-export type layoutCookieElementType = z.infer<typeof layoutCookieElementSchema>;
+export type LayoutCookieElementType = z.infer<typeof layoutCookieElementSchema>;
 export type LayoutCookieType = z.infer<typeof layoutCookieSchema>;
+
+export function loadLayoutCookie(): LayoutCookieType {
+    // TODO: implement loading
+    return [];
+}
+
+export function dumpLayoutCookie(nc: LayoutCookieType) {
+    // TODO: implement loading
+}

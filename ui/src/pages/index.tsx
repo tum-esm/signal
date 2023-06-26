@@ -26,6 +26,10 @@ import {
     TablerIconTimeDuration60,
     TablerIconTimeDurationOff,
 } from "@/components/custom/icons";
+import {
+    LayoutCookieElementType,
+    LayoutCookieType,
+} from "@/utilities/layout-cookies";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -34,7 +38,6 @@ export default function Page() {
     const [columns, setColumns] = useState<TableColumnRecordType[] | undefined>(
         undefined
     );
-
     const [activeCollectionName, setActiveCollectionName] = useState<
         string | undefined
     >(undefined);
@@ -45,7 +48,6 @@ export default function Page() {
     const collectionNames = useMemo(() => {
         return tables ? tables.map((t) => t.collectionName) : [];
     }, [tables]);
-
     const tableNames = useMemo(
         () =>
             tables
@@ -118,6 +120,15 @@ export default function Page() {
         };
         f();
     }, [pb, activeCollectionName, activeTableName]);
+
+    const [layoutCookie, setLayoutCookie] = useState<
+        LayoutCookieType | undefined
+    >();
+    // TODO: load layout cookie
+
+    // TODO: determine cookie of currently visible table if exists
+    const currentLayoutCookieElement: LayoutCookieElementType | undefined =
+        undefined;
 
     return (
         <>
