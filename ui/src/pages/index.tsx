@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import PocketBase from "pocketbase";
 const inter = Inter({ subsets: ["latin"] });
-
 import {
     Select,
     SelectContent,
@@ -12,10 +11,6 @@ import {
 } from "@/components/shadcnui/select";
 import { cn } from "@/utilities/class-names";
 import { useEffect, useMemo, useState } from "react";
-import {
-    TableColumnRecordType,
-    fetchTableColumns,
-} from "@/utilities/fetch-table-columns";
 import { TableRecordType, fetchTables } from "@/utilities/fetch-tables";
 import { PlotPanel } from "@/components/custom/plot-panel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcnui/tabs";
@@ -25,17 +20,11 @@ import {
     TablerIconTimeDuration60,
     TablerIconTimeDurationOff,
 } from "@/components/custom/icons";
-import {
-    LayoutCookieElementType,
-    LayoutCookieType,
-} from "@/utilities/layout-cookies";
-import { findIndex } from "lodash";
+import { LayoutCookieType } from "@/utilities/layout-cookies";
+import { PlotGrid } from "@/components/custom/plot-grid";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
-        undefined
-    );
-    const [columns, setColumns] = useState<TableColumnRecordType[] | undefined>(
         undefined
     );
     const [activeCollectionName, setActiveCollectionName] = useState<
@@ -44,7 +33,6 @@ export default function Page() {
     const [activeTableName, setActiveTableName] = useState<string | undefined>(
         undefined
     );
-
     const collectionNames = useMemo(() => {
         return tables ? tables.map((t) => t.collectionName) : [];
     }, [tables]);
@@ -57,7 +45,6 @@ export default function Page() {
                 : [],
         [tables, activeCollectionName]
     );
-
     const [timeBin, setTimeBin] = useState<15 | 60 | 240 | 720>(60);
     const [refreshPeriod, setRefreshPeriod] = useState<-1 | 10 | 30 | 60>(-1);
     function updateRefreshPeriod() {
@@ -102,50 +89,10 @@ export default function Page() {
         }
     }, [tableNames]);
 
-    // when tableName changes, fetch columns
-    useEffect(() => {
-        const f = async () => {
-            if (
-                activeCollectionName !== undefined &&
-                activeTableName !== undefined
-            ) {
-                setColumns(
-                    await fetchTableColumns(
-                        pb,
-                        activeCollectionName,
-                        activeTableName
-                    )
-                );
-            }
-        };
-        f();
-    }, [pb, activeCollectionName, activeTableName]);
-
     const [layoutCookie, setLayoutCookie] = useState<
         LayoutCookieType | undefined
     >();
     // TODO: load layout cookie
-
-    const currentLayoutCookieElement: LayoutCookieElementType | undefined =
-        useMemo(() => {
-            if (
-                layoutCookie === undefined ||
-                activeCollectionName === undefined ||
-                activeTableName === undefined
-            ) {
-                return undefined;
-            }
-            const index = findIndex(
-                layoutCookie,
-                (lce) =>
-                    lce.collectionName == activeCollectionName &&
-                    lce.tableName == activeTableName
-            );
-            if (index === -1) {
-                return undefined;
-            }
-            return layoutCookie[index];
-        }, [layoutCookie, activeCollectionName, activeTableName]);
 
     return (
         <>
@@ -258,36 +205,32 @@ export default function Page() {
                     "min-h-[calc(100vh-4rem)]"
                 )}
             >
-                {activeTableName === undefined && (
+                {(activeCollectionName === undefined ||
+                    activeTableName === undefined) && (
                     <div className="mx-6 my-6 text-base font-semibold">
                         Select a collection and table to view columns
                     </div>
                 )}
-                {activeTableName !== undefined && columns === undefined && (
-                    <div className="mx-6 my-6 text-base font-semibold">
-                        Loading columns...
-                    </div>
-                )}
-                {activeTableName !== undefined &&
-                    layoutCookie === undefined && (
-                        <div className="mx-6 my-6 text-base font-semibold">
-                            Loading layout...
-                        </div>
+                {activeCollectionName !== undefined &&
+                    activeTableName !== undefined && (
+                        <>
+                            {layoutCookie === undefined && (
+                                <div className="mx-6 my-6 text-base font-semibold">
+                                    Loading Layout from Cookie
+                                </div>
+                            )}
+                            {layoutCookie !== undefined && (
+                                <PlotGrid
+                                    pb={pb}
+                                    layoutCookie={layoutCookie}
+                                    collectionName={activeCollectionName}
+                                    tableName={activeTableName}
+                                    timeBin={timeBin}
+                                    refreshPeriod={refreshPeriod}
+                                />
+                            )}
+                        </>
                     )}
-                {columns !== undefined && layoutCookie !== undefined && (
-                    /* TODO: add component "PlotLayout */ <div
-                        className={cn("grid grid-cols-1 4xl:grid-cols-2 gap-4")}
-                    >
-                        {columns.map((c) => (
-                            <PlotPanel
-                                key={c.id}
-                                tableColumn={c}
-                                timeBin={timeBin}
-                                refreshPeriod={refreshPeriod}
-                            />
-                        ))}
-                    </div>
-                )}
             </main>
         </>
     );
