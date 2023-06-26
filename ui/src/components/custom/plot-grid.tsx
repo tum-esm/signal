@@ -26,6 +26,7 @@ export function PlotGrid(props: {
     const [layout, setLayout] = useState<LayoutCookieElementType | undefined>(
         undefined
     );
+    const [showLayoutEditor, setShowLayoutEditor] = useState<boolean>(false);
 
     // when tableName changes, fetch columns
     useEffect(() => {
@@ -80,6 +81,11 @@ export function PlotGrid(props: {
         }
     }, [props.layoutCookie, props.collectionName, props.tableName, columns]);
 
+    useEffect(() => {
+        setColumns(undefined);
+        setLayout(undefined);
+    }, [props.tableName, props.collectionName]);
+
     if (columns === undefined) {
         return (
             <div className="mx-6 my-6 text-base font-semibold">
@@ -96,6 +102,10 @@ export function PlotGrid(props: {
         );
     }
 
+    if (showLayoutEditor) {
+        return <div>Layout Editor</div>;
+    }
+
     const renderedColumns: TableColumnRecordType[] = [];
     layout.columns
         .sort((c1, c2) => c1.position - c2.position)
@@ -109,15 +119,20 @@ export function PlotGrid(props: {
         });
 
     return (
-        <div className={cn("grid grid-cols-1 4xl:grid-cols-2 gap-4")}>
-            {renderedColumns.map((c) => (
-                <PlotPanel
-                    key={c.id}
-                    tableColumn={c}
-                    timeBin={props.timeBin}
-                    refreshPeriod={props.refreshPeriod}
-                />
-            ))}
-        </div>
+        <>
+            <div className={cn("grid grid-cols-1 4xl:grid-cols-2 gap-4")}>
+                {renderedColumns.map((c) => (
+                    <PlotPanel
+                        key={c.id}
+                        tableColumn={c}
+                        timeBin={props.timeBin}
+                        refreshPeriod={props.refreshPeriod}
+                    />
+                ))}
+            </div>
+            <div className="flex flex-row justify-end">
+                <button>SHow</button>
+            </div>
+        </>
     );
 }

@@ -35,10 +35,12 @@ export async function fetchData(
         `signal_column = "${tableColumn.id}" && ` +
         `created >= "${minDateString}"`;
 
+    console.log(`start loading data for column ${tableColumn.columnName}}`);
     const resultList = await pb.collection("signal_records").getFullList({
         filter: filterString,
         $autoCancel: false,
     });
+    console.log(`finished loading data for column ${tableColumn.columnName}}`);
     return resultList
         .map((record) => dataRecordSchema.parse(record))
         .filter(
