@@ -1,6 +1,6 @@
 import { cn } from "@/utilities/class-names";
-import { DataRecordType, fetchData } from "@/utilities/fetch-data";
-import { TableColumnRecordType } from "@/utilities/fetch-table-columns";
+import { DataRecordType, fetchData } from "@/utilities/fetching/data";
+import { TableColumnRecordType } from "@/utilities/fetching/columns";
 import PocketBase from "pocketbase";
 import { useEffect, useMemo, useState } from "react";
 import { min, mean, sortedUniq, max } from "lodash";

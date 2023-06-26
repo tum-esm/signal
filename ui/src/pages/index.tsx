@@ -11,7 +11,7 @@ import {
 } from "@/components/shadcnui/select";
 import { cn } from "@/utilities/class-names";
 import { useEffect, useMemo, useState } from "react";
-import { TableRecordType, fetchTables } from "@/utilities/fetch-tables";
+import { TableRecordType, fetchTables } from "@/utilities/fetching/tables";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcnui/tabs";
 import {
     TablerIconTimeDuration10,

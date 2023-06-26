@@ -1,6 +1,6 @@
 import { z } from "zod";
 import PocketBase from "pocketbase";
-import { TableColumnRecordType } from "./fetch-table-columns";
+import { TableColumnRecordType } from "./columns";
 
 const dataRecordSchema = z
     .object({
