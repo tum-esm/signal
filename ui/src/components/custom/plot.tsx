@@ -70,13 +70,16 @@ export function Plot(props: {
         [key in 15 | 60 | 240 | 720]: DataRecordType[];
     } = useMemo(() => {
         function f(timeBin: 15 | 60 | 240 | 720) {
-            return smoothData(
+            /*return smoothData(
                 props.allData.filter(
                     (d) => d.timestamp >= currentTimestamp - timeBin * 60000
                 ),
                 timeBin,
                 props.sensorIds,
                 currentTimestamp
+            );*/
+            return props.allData.filter(
+                (d) => d.timestamp >= currentTimestamp - timeBin * 60000
             );
         }
         return { 15: f(15), 60: f(60), 240: f(240), 720: f(720) };
