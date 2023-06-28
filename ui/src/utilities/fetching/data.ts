@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TableColumnRecordType } from "./columns";
 import { fetchFullList } from "./fetch-full-list";
+import { max } from "lodash";
 
 const dataRecordSchema = z
     .object({
@@ -24,19 +25,31 @@ const dataRecordSchema = z
 export type DataRecordType = z.infer<typeof dataRecordSchema>;
 
 export async function fetchData(
-    tableColumn: TableColumnRecordType
+    tableColumn: TableColumnRecordType,
+    latestDataTimestamp: number
 ): Promise<DataRecordType[]> {
-    const minDateString = new Date(Date.now() - 720 * 60 * 1000)
+    const earliestPlotTimeStamp = new Date().getTime() - 720 * 60 * 1000;
+    const minDateString = new Date(
+        latestDataTimestamp > earliestPlotTimeStamp
+            ? latestDataTimestamp
+            : earliestPlotTimeStamp
+    )
         .toISOString()
         .replace("T", " ")
         .substring(0, 19);
 
-    console.log(`start loading data for column ${tableColumn.columnName}}`);
+    console.log(
+        `fetching column ${tableColumn.columnName}} from ` +
+            `${minDateString}: start`
+    );
     const resultList = await fetchFullList(
         "signal_records",
-        `(signal_column="${tableColumn.id}")%26%26(created>="${minDateString}")`
+        `(signal_column="${tableColumn.id}")%26%26(datetime>="${minDateString}")`
     );
-    console.log(`finished loading data for column ${tableColumn.columnName}}`);
+    console.log(
+        `fetching column ${tableColumn.columnName}} from ` +
+            `${minDateString}: done, ${resultList.length} new item(s)`
+    );
 
     return resultList
         .map((record) => dataRecordSchema.parse(record))

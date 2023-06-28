@@ -2,7 +2,7 @@ import { cn } from "@/utilities/class-names";
 import { DataRecordType, fetchData } from "@/utilities/fetching/data";
 import { TableColumnRecordType } from "@/utilities/fetching/columns";
 import { useEffect, useMemo, useState } from "react";
-import { min, sortedUniq, max } from "lodash";
+import { min, sortedUniq, max, last } from "lodash";
 import { Plot } from "./plot";
 
 export function PlotPanel(props: {
@@ -47,15 +47,27 @@ export function PlotPanel(props: {
 
     useEffect(() => {
         async function updateAllData() {
+            let lastDataTimestamp;
+            if (allData.length > 0) {
+                lastDataTimestamp = last(allData)?.timestamp;
+            }
+            const lastKeptDataTimestamp = (lastDataTimestamp || 0) - 10;
             setRefreshIsRunning(true);
-            setAllData(await fetchData(props.tableColumn));
+            const newData = await fetchData(
+                props.tableColumn,
+                lastKeptDataTimestamp
+            );
+            setAllData([
+                ...allData.filter((d) => d.timestamp <= lastKeptDataTimestamp),
+                ...newData,
+            ]);
             setRefreshIsRunning(false);
             setRefreshIsDue(false);
         }
         if (refreshIsDue && !refreshIsRunning) {
             updateAllData();
         }
-    }, [props.tableColumn, refreshIsRunning, refreshIsDue]);
+    }, [props.tableColumn, refreshIsRunning, refreshIsDue, allData]);
 
     useEffect(() => {
         if (props.refreshPeriod !== -1) {
