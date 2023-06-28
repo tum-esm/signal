@@ -97,7 +97,7 @@ export function PlotPanel(props: {
             <div
                 className={cn(
                     "flex flex-col border-r border-slate-200",
-                    "w-[22rem] min-h-[16rem] flex-shrink-0"
+                    "w-[22rem] min-h-[19rem] flex-shrink-0"
                 )}
             >
                 <h2

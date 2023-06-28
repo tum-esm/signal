@@ -127,9 +127,6 @@ export function PlotGrid(props: {
                     />
                 ))}
             </div>
-            <div className="flex flex-row justify-end">
-                <button>SHow</button>
-            </div>
         </>
     );
 }

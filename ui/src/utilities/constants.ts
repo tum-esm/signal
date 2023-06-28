@@ -12,8 +12,8 @@ export const CONSTANTS: {
         xMin: 30,
         xMax: 385,
         yMin: 2,
-        yMax: 132,
+        yMax: 152,
         width: 400,
-        height: 150,
+        height: 170,
     },
 };
