@@ -47,20 +47,24 @@ export function PlotPanel(props: {
 
     useEffect(() => {
         async function updateAllData() {
+            setRefreshIsRunning(true);
             let lastDataTimestamp;
             if (allData.length > 0) {
                 lastDataTimestamp = last(allData)?.timestamp;
             }
             const lastKeptDataTimestamp = (lastDataTimestamp || 0) - 10;
-            setRefreshIsRunning(true);
             const newData = await fetchData(
                 props.tableColumn,
                 lastKeptDataTimestamp
             );
-            setAllData([
-                ...allData.filter((d) => d.timestamp <= lastKeptDataTimestamp),
-                ...newData,
-            ]);
+            if (newData.length > 0) {
+                setAllData([
+                    ...allData.filter(
+                        (d) => d.timestamp <= lastKeptDataTimestamp
+                    ),
+                    ...newData,
+                ]);
+            }
             setRefreshIsRunning(false);
             setRefreshIsDue(false);
         }
