@@ -12,9 +12,8 @@ export function TUMHeader() {
             </Link>
             <Link href="/">
                 <h1 className="hidden pl-5 font-light uppercase text-slate-950 xl:block xl:text-lg 2xl:text-xl">
-                    <span className="font-medium">Signal Dashboard</span>{" "}
-                    &nbsp;|&nbsp; Professorship of Environmental Sensing and
-                    Modeling
+                    <span className="font-medium">Signal</span> &nbsp;|&nbsp;
+                    Professorship of Environmental Sensing and Modeling
                 </h1>
             </Link>
             <div className="flex-grow" />
