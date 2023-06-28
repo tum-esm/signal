@@ -7,10 +7,7 @@ export async function fetchFullList(
             `https://esm-linode.dostuffthatmatters.dev/api/collections/${collection}/records?perPage=500` +
                 (filter ? `&filter=${filter}` : ""),
             {
-                next: {
-                    revalidate: 500,
-                },
-                cache: "force-cache",
+                cache: "no-cache",
             }
         )
     ).json();
@@ -24,10 +21,7 @@ export async function fetchFullList(
                 `https://esm-linode.dostuffthatmatters.dev/api/collections/${collection}/records?perPage=500&page=${i}` +
                     (filter ? `&filter=${filter}` : ""),
                 {
-                    next: {
-                        revalidate: 500,
-                    },
-                    cache: "force-cache",
+                    cache: "no-cache",
                 }
             )
         ).json();
