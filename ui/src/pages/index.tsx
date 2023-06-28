@@ -20,6 +20,7 @@ import {
 } from "@/components/custom/icons";
 import { LayoutCookieType, loadLayoutCookie } from "@/utilities/layout-cookies";
 import { PlotGrid } from "@/components/custom/plot-grid";
+import { TUMHeader } from "@/components/custom/tum-header";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -91,6 +92,7 @@ export default function Page() {
 
     return (
         <>
+            <TUMHeader />
             <header
                 className={`${inter.className} flex items-center h-16 px-6 border-b border-slate-200`}
             >

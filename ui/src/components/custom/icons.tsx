@@ -86,3 +86,16 @@ export const TablerIconTimeDurationOff = () => (
         <path d="M3 3l18 18"></path>
     </svg>
 );
+
+export const TUMLogo = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 5334 2792"
+        className="w-full"
+    >
+        <path
+            d="M4266.67,2791.67l-0,-2258.33l533.333,0l0,2258.33l533.333,-0l0,-2791.67l-2666.67,0l-0,2258.33l-533.334,0l0,-2258.33l-2133.33,0l0,533.333l533.333,0l0,2258.33l533.334,-0l-0,-2258.33l533.333,0l0,2258.33l1600,-0l0,-2258.33l533.333,0l0,2258.33l533.334,-0Z"
+            className="fill-white"
+        />
+    </svg>
+);
