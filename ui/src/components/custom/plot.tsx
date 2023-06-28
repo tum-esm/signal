@@ -5,7 +5,7 @@ import { generateTicks } from "@/utilities/math";
 import { plotData, plotGrid, plotLabels } from "@/utilities/plotting";
 import * as d3 from "d3";
 import { concat, max, mean, min, range } from "lodash";
-import { useEffect, useMemo, useRef } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 
 function smoothData(
     data: DataRecordType[],
@@ -54,10 +54,17 @@ export function Plot(props: {
     timeBin: 15 | 60 | 240 | 720;
 }) {
     const d3ContainerRef = useRef(null);
-
     const currentTimestamp = new Date().getTime();
-
     console.log(`Plot render ${new Date().getTime()}`);
+
+    const [loadingState, setLoadingState] = useState<
+        "loading" | "parsing" | "plotting" | "ready"
+    >("loading");
+    useEffect(() => {
+        if (props.allData.length > 0) {
+            setLoadingState("parsing");
+        }
+    }, [props.allData]);
 
     const timeBinData: {
         [key in 15 | 60 | 240 | 720]: DataRecordType[];
@@ -139,7 +146,13 @@ export function Plot(props: {
     }, [timeBinYTicks]);
 
     useEffect(() => {
-        if (d3ContainerRef.current) {
+        if (
+            d3ContainerRef.current &&
+            (loadingState === "parsing" || loadingState === "ready")
+        ) {
+            if (loadingState === "parsing") {
+                setLoadingState("plotting");
+            }
             const svg = d3.select(d3ContainerRef.current);
             plotGrid(
                 svg,
@@ -162,6 +175,7 @@ export function Plot(props: {
                 timeBinYScale,
                 props.sensorIds
             );
+            setLoadingState("ready");
         }
     }, [
         d3ContainerRef,
@@ -172,18 +186,27 @@ export function Plot(props: {
         timeBinYScale,
         props.sensorIds,
     ]);
-
-    // TODO: do CSSing to only plot the selected time bin
     return (
         <div
             className={cn(
-                "w-full p-4 bg-white",
+                "w-full p-4 bg-white relative",
                 props.timeBin !== 15 ? "time-bin-15-hidden" : "",
                 props.timeBin !== 60 ? "time-bin-60-hidden" : "",
                 props.timeBin !== 240 ? "time-bin-240-hidden" : "",
                 props.timeBin !== 720 ? "time-bin-720-hidden" : ""
             )}
         >
+            {loadingState !== "ready" && (
+                <div
+                    className={cn(
+                        "absolute z-50 text-sm rounded-sm px-1 py-0.5",
+                        "top-1/2 right-1/2 transform translate-x-1/2 -translate-y-1/2",
+                        "bg-slate-900 text-slate-100"
+                    )}
+                >
+                    {loadingState}
+                </div>
+            )}
             <svg
                 className="relative z-0 rounded no-selection"
                 ref={d3ContainerRef}

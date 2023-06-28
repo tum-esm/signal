@@ -87,8 +87,8 @@ export function plotGrid(
         .enter()
         .append("rect")
         .merge(frameRectsSelection)
-        .attr("x", xScale(xTicks[0]))
-        .attr("y", yScale(yTicks[yTicks.length - 1]))
+        .attr("x", CONSTANTS.PLOT.xMin)
+        .attr("y", CONSTANTS.PLOT.yMin)
         .attr("width", CONSTANTS.PLOT.xMax - CONSTANTS.PLOT.xMin)
         .attr("height", CONSTANTS.PLOT.yMax - CONSTANTS.PLOT.yMin)
         .attr("fill", "none")
@@ -181,7 +181,7 @@ export function plotLabels(
             .attr("alignment-baseline", "middle")
             .attr("fill", "#1e293b")
             .attr("font-size", 6)
-            .text((value: number) => value.toPrecision(5));
+            .text((value: number) => value.toPrecision(4));
 
         yLabelsTextSelection.exit().remove();
     });
