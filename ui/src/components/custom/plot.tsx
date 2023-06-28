@@ -14,7 +14,6 @@ export function Plot(props: {
 }) {
     const d3ContainerRef = useRef(null);
     const currentTimestamp = new Date().getTime();
-    console.log(`Plot render ${new Date().getTime()}`);
 
     const [loadingState, setLoadingState] = useState<
         "loading" | "parsing" | "plotting" | "ready"
@@ -139,7 +138,17 @@ export function Plot(props: {
         timeBinXScale,
         timeBinYScale,
         props.sensorIds,
+        loadingState,
     ]);
+
+    let renderedMessage: string | undefined;
+    if (loadingState !== "ready") {
+        renderedMessage = loadingState;
+    } else {
+        if (timeBinData[props.timeBin].length === 0) {
+            renderedMessage = "no data in this time period";
+        }
+    }
     return (
         <div
             className={cn(
@@ -150,15 +159,16 @@ export function Plot(props: {
                 props.timeBin !== 720 ? "time-bin-720-hidden" : ""
             )}
         >
-            {loadingState !== "ready" && (
+            {renderedMessage && (
                 <div
                     className={cn(
-                        "absolute z-50 text-sm rounded-sm px-1 py-0.5",
-                        "top-1/2 right-1/2 transform translate-x-1/2 -translate-y-1/2",
-                        "bg-slate-900 text-slate-100"
+                        "absolute z-50 text-sm rounded-sm px-2 py-1",
+                        "top-[calc(50%-1.2rem)] right-[calc(50%-1.1rem)]",
+                        "transform translate-x-1/2 -translate-y-1/2",
+                        "bg-slate-800 text-slate-100 shadow"
                     )}
                 >
-                    {loadingState}
+                    {renderedMessage}
                 </div>
             )}
             <svg
