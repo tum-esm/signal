@@ -71,6 +71,10 @@ export function PlotPanel(props: {
 
     useEffect(() => {
         if (props.refreshPeriod !== -1) {
+            // refresh once immediately
+            setRefreshIsDue(true);
+
+            // refresh periodically
             const interval = setInterval(
                 () => setRefreshIsDue(true),
                 props.refreshPeriod * 1000
