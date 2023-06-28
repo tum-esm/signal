@@ -21,6 +21,7 @@ import {
 import { LayoutCookieType, loadLayoutCookie } from "@/utilities/layout-cookies";
 import { PlotGrid } from "@/components/custom/plot-grid";
 import { TUMHeader } from "@/components/custom/tum-header";
+import Head from "next/head";
 
 export default function Page() {
     const [tables, setTables] = useState<TableRecordType[] | undefined>(
@@ -92,6 +93,16 @@ export default function Page() {
 
     return (
         <>
+            <Head>
+                <title>TUM ESM Signal</title>
+                <link rel="shortcut icon" href="/favicon.ico" />
+                <meta property="og:title" content="TUM ESM Signal" />
+                <meta
+                    property="og:description"
+                    content="plot arbitrary time series data from Python on a website"
+                />
+                <meta property="og:image" content="/favicon.ico" />
+            </Head>
             <TUMHeader />
             <header
                 className={`${inter.className} flex items-center h-16 px-6 border-b border-slate-200`}
@@ -102,7 +113,7 @@ export default function Page() {
                             "flex flex-row items-center justify-start gap-x-2 w-full"
                         )}
                     >
-                        <div className="text-base font-medium">Collection</div>
+                        <div className="text-sm font-semibold">Collection</div>
                         <Select
                             onValueChange={(v) => setActiveCollectionName(v)}
                             value={activeCollectionName}
@@ -122,7 +133,7 @@ export default function Page() {
                         </Select>
                         {activeCollectionName !== undefined && (
                             <>
-                                <div className="text-base font-medium">
+                                <div className="ml-2 text-sm font-semibold">
                                     Table
                                 </div>
                                 <Select
@@ -160,7 +171,7 @@ export default function Page() {
                             </TabsList>
                         </Tabs>
                         <div className="w-px h-16 mx-3 bg-slate-200" />
-                        <div className="text-base font-medium">Refresh</div>
+                        <div className="text-sm font-semibold">Refresh</div>
                         <button
                             className={cn(
                                 "p-2 rounded-md shadow-sm w-[3.75rem] h-9",
@@ -183,7 +194,7 @@ export default function Page() {
                                 <TablerIconTimeDuration60 />
                             )}
                             {refreshPeriod === -1 && (
-                                <div className="relative flex-shrink-0 w-2 h-2 mr-1 rounded-full bg-slate-400" />
+                                <div className="relative flex-shrink-0 w-2 h-2 mr-1 rounded-full bg-slate-200" />
                             )}
                             {refreshPeriod !== -1 && (
                                 <div className="relative flex-shrink-0 w-2 h-2 mr-1">
