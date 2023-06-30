@@ -15,11 +15,15 @@ export function PlotPanel(props: {
     const [refreshIsDue, setRefreshIsDue] = useState(true);
     const [refreshIsRunning, setRefreshIsRunning] = useState(false);
 
-    const sensorIds = useMemo(() => {
-        return timedData
+    const [sensorIds, setSensorIds] = useState<string[]>([]);
+    useEffect(() => {
+        const newSensorIds = timedData
             ? sortedUniq(timedData.map((d) => d.sensorId).sort())
             : [];
-    }, [timedData]);
+        if (JSON.stringify(newSensorIds) !== JSON.stringify(sensorIds)) {
+            setSensorIds(newSensorIds);
+        }
+    }, [timedData, sensorIds]);
 
     const sensorIdMetricValues: {
         [sensorId: string]: {

@@ -13,8 +13,11 @@ export function Plot(props: {
     timeBin: 15 | 60 | 240 | 720;
 }) {
     const d3ContainerRef = useRef(null);
-    const currentTimestamp = new Date().getTime();
-
+    const currentTimestamp = useMemo(
+        () => new Date().getTime(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [props.allData]
+    );
     const [loadingState, setLoadingState] = useState<
         "loading" | "parsing" | "plotting" | "ready"
     >("loading");
@@ -106,6 +109,8 @@ export function Plot(props: {
             if (loadingState === "parsing") {
                 setLoadingState("plotting");
             }
+            // TODO: why is this being called when switching between time bins?
+            console.log("rendering D3 stuff");
             const svg = d3.select(d3ContainerRef.current);
             plotGrid(
                 svg,
