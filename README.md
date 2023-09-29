@@ -2,6 +2,8 @@
 
 🔥 Replaces https://github.com/tum-esm/shareable-timeseries-visualization
 
+*You can ask Moritz Makowski (moritz.makowski@tum.de) for permissions on our hosted instance of this tool (https://tum-esm-signal.netlify.app/).*
+
 <br/>
 
 **Installation:**
